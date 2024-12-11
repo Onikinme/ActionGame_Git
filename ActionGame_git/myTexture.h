@@ -1,8 +1,4 @@
-#include <windows.h>
-#include <d3d9.h>			// Direct3D9 (DirectX9 Graphics)に必要.
-#include <d3dx9core.h>		// DirectX スプライトに必要.
-#include <tchar.h>
-#include <stdio.h>
+#pragma once
 
 const int MAX_TEXTURE = 256;
 

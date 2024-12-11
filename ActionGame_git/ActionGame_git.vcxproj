@@ -139,11 +139,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DirectX.cpp" />
+    <ClCompile Include="myApp.cpp" />
     <ClCompile Include="myBitmapFont.cpp" />
+    <ClCompile Include="myEnemyAAA.cpp" />
+    <ClCompile Include="myEnemyManager.cpp" />
+    <ClCompile Include="myExplosionBuffer.cpp" />
+    <ClCompile Include="myExplosionOne.cpp" />
+    <ClCompile Include="myFile.cpp" />
     <ClCompile Include="myInput.cpp" />
+    <ClCompile Include="myPlayer.cpp" />
+    <ClCompile Include="mySound.cpp" />
     <ClCompile Include="myTexture.cpp" />
-    <ClCompile Include="STG_v1.cpp" />
-    <ClCompile Include="test.cpp" />
+    <ClCompile Include="myTimer.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="myApp.h" />
+    <ClInclude Include="myBitmapFont.h" />
+    <ClInclude Include="myEnemyAAA.h" />
+    <ClInclude Include="myEnemyManager.h" />
+    <ClInclude Include="myExplosionBuffer.h" />
+    <ClInclude Include="myExplosionOne.h" />
+    <ClInclude Include="myFile.h" />
+    <ClInclude Include="myInput.h" />
+    <ClInclude Include="myPlayer.h" />
+    <ClInclude Include="mySound.h" />
+    <ClInclude Include="myTexture.h" />
+    <ClInclude Include="myTimer.h" />
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
