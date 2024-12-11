@@ -142,7 +142,7 @@
     <ClCompile Include="myBitmapFont.cpp" />
     <ClCompile Include="myInput.cpp" />
     <ClCompile Include="myTexture.cpp" />
-    <ClCompile Include="STG_v1.cpp" />
+    <ClCompile Include="STG_v1_bossTmp.cpp" />
     <ClCompile Include="test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

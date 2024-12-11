@@ -13,7 +13,7 @@ int MyTexture::sm_maxTexture = 0;
 // ppTex 作成するテクスチャへのポインタを入れるためのポインタ.
 HRESULT LoadTexture(IDirect3DDevice9* pDev, const TCHAR* pFname, IDirect3DTexture9** ppTex)
 {
-	HRESULT hr = D3DXCreateTextureFromFile(pDev, pFname, ppTex);
+	HRESULT hr = D3DXCreateTextureFromFileEx(pDev, pFname, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, ppTex);
 	if (FAILED(hr))
 	{
 		// 失敗したので一つ上のフォルダからテクスチャを探してみる.
