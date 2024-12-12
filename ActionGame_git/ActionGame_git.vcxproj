@@ -142,6 +142,10 @@
     <ClCompile Include="DirectX.cpp" />
     <ClCompile Include="myApp.cpp" />
     <ClCompile Include="myBitmapFont.cpp" />
+    <ClCompile Include="myBossAAA.cpp" />
+    <ClCompile Include="myBossTmp.cpp" />
+    <ClCompile Include="myBulletBuffer.cpp" />
+    <ClCompile Include="myBulletOne.cpp" />
     <ClCompile Include="myEnemyAAA.cpp" />
     <ClCompile Include="myEnemyManager.cpp" />
     <ClCompile Include="myExplosionBuffer.cpp" />
@@ -157,6 +161,10 @@
   <ItemGroup>
     <ClInclude Include="myApp.h" />
     <ClInclude Include="myBitmapFont.h" />
+    <ClInclude Include="myBossAAA.h" />
+    <ClInclude Include="myBossTmp.h" />
+    <ClInclude Include="myBulletBuffer.h" />
+    <ClInclude Include="myBulletOne.h" />
     <ClInclude Include="myEnemyAAA.h" />
     <ClInclude Include="myEnemyManager.h" />
     <ClInclude Include="myExplosionBuffer.h" />

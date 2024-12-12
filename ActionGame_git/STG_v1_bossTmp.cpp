@@ -160,6 +160,8 @@ float GetDistance2(float x1, float y1, float x2, float y2)
 {
 	return ((x1 - x2) * (x1 - x2)) + ((y1 - y2) * (y1 - y2));
 }
+
+/*
 const RECT g_BossImageArea[] = 
 {
 	{ 0,   0, 48,  48 },
@@ -171,6 +173,7 @@ const RECT g_BossImageArea[] =
 	{ 0, 336, 48, 384 },
 	{ 0, 384, 48, 432 },
 };
+*/
 
 
 

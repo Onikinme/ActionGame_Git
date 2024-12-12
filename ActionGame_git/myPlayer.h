@@ -97,6 +97,9 @@ public:
 	// 現在のプレイヤーのXY座標値を得る.
 	D3DXVECTOR2 GetXY();
 
+	// 現在のプレイヤーのサイズを得る.
+	float GetSize();
+
 	// 現在の武器のXY座標値を得る.
 	D3DXVECTOR2 GetWeaponXY();
 

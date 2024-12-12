@@ -9,7 +9,9 @@
 #include "myTexture.h"
 #include "myTimer.h"
 #include "myPlayer.h"
+#include "myBossTmp.h"
 #include "myEnemyManager.h"
+#include "myBulletBuffer.h"
 #include "myExplosionBuffer.h"
 
 #define STAGE_COUNT 3
@@ -48,6 +50,7 @@ public:
 	IDirect3DDevice9* GetDevice() { return pDevice; }		// スプライトの取得.
 	ID3DXSprite* GetSprite() { return pSprite; }		// スプライトの取得.
 	EnemyManager* GetEnemyMgr() { return pEnemyMgr; }	// 敵管理クラスのポインタ取得.
+	BulletBuffer* GetEneBltBuf() { return pBossBullet; }// 敵弾丸バッファの取得.
 	ExplosionBuffer* GetExplMgr() { return pExplMgr; }	// 爆発のポインタ取得.
 	MyTexture* GetEffectTex() { return pEffectTex; }	// エフェクトのテクスチャ.
 	MyTexture* GetEnemyTexA() { return pEnemyTexA; }	// 敵Aのテクスチャ.
@@ -56,14 +59,26 @@ public:
 	GameState GetGameState() { return gameState; }	// ゲーム状態の取得.
 
 	void	AddScore(int add) { score += add; }
+	// プレイヤーの現在座標を取得
+	void	GetPlayerPos(D3DXVECTOR2& pos)
+	{
+		pos = pPlayer->GetXY();
+	}
+	// プレイヤーのサイズを取得
+	void	GetPlayerSize(float& size)
+	{
+		size = pPlayer->GetSize();
+	}
 
-	// キャラの描画
-	void DrawChara(ID3DXSprite* pSprite, IDirect3DTexture9* pTexture,
+	// 描画関数
+	void Draw(ID3DXSprite* pSprite, IDirect3DTexture9* pTexture,
 		D3DXVECTOR3 pos, RECT rc, float textureWidth, float textureHeight, bool flipHorizontal, bool flipVertical);
 	// 当たり判定（円）
 	bool Collision(D3DXVECTOR2 a, float a_r, D3DXVECTOR2 b, float b_r);
 
 	void CreateEnemyA(float x, float y, float vx, float vy, int maxhp);		// 敵Ａを生成.
+
+	void CreateBossA(float x, float y, float vx, float vy, int maxhp);		// ボスＡを生成.
 
 private:
 	HRESULT	InitDirect3D();			// Direct3Dの初期化
@@ -85,7 +100,12 @@ private:
 	MyTexture* pPlayerTex;			// 自機.
 	MyTexture* pPlayer_WeaponTex;	// プレイヤーの武器
 	MyTexture* pMatoTex;			// 当たり判定チェック用の的.
-	MyTexture* pBulletTex;			// 自機弾丸.
+	//MyTexture* pBulletTex;			// 自機弾丸.
+
+	BulletBuffer* pBossBullet;	// ボスの弾丸.
+	MyTexture* pEnemyBltTex;		// 敵弾丸テクスチャ.
+	BossManager* pBossMgr;
+	MyTexture* tmpBossTex;//ボスtmp
 
 	MyTexture* BossHPBar_BlackTex;		// ボスのHPバー（黒）
 	MyTexture* BossHPBar_PinkTex;		// ボスのHPバー（ピンク）
@@ -110,8 +130,6 @@ private:
 
 	int score;						// スコア.
 	int playerPower;				// 自機の耐久力.
-
-	MyTexture* pEnemyBltTex;		// 敵弾丸テクスチャ.
 
 	UINT joyID;						// ゲームコントローラのID.
 	int gameTimer;					// 全体のタイマー.

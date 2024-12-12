@@ -38,20 +38,7 @@ void EnemyBase::Show()
 	D3DXVECTOR3 pos(m_pos.x, m_pos.y, 0);
 	MyApp* myapp = GetApp();
 	ID3DXSprite* pSpr = GetApp()->GetSprite();
-	myapp->DrawChara(pSpr, m_pTex->GetTexture(), pos, { 0, 0, 48, 48 }, 48.0f, 48.0f, false, false);
-	/*
-	D3DXVECTOR3 matopos(pData->Mato->GetXY(i).x, pData->Mato->GetXY(i).y, 0);
-	pSpr->DrawChara(pData->pDevice, pData->pSprite, pData->pMatoTex->GetTexture(), matopos, { 0, 0, 48, 48 }, 48.0f, 48.0f, false, false);
-	*/
-
-	/*
-	D3DXVECTOR3 cnt(32.0f, 32.0f, 0.0f);	// 表示時の中心位置.
-	D3DXVECTOR3 pos(m_posX, m_posY, 0.0f);	// 表示位置.
-	int time = (int)(m_timer / 10);			// 経過時間を10フレーム単位に換算.
-	int anim = time % 4;					// テクスチャアニメーションを4パターンで.
-	ID3DXSprite* pSpr = GetApp()->GetSprite();
-	pSpr->Draw(m_pTex->GetTexture(), &(g_EnemyImageArea[anim]), &cnt, &pos, 0xFFFFFFFF);
-	*/
+	myapp->Draw(pSpr, m_pTex->GetTexture(), pos, { 0, 0, 48, 48 }, 48.0f, 48.0f, false, false);
 }
 
 // 現在のXY座標値を得る.
@@ -99,6 +86,13 @@ bool EnemyBase::IsActive()
 	return (m_timer >= 0.0f);
 }
 */
+
+// 位置(cx, cy)と自分の位置(posX, posY)は距離limit2より近いかどうか.
+// limit2は距離の二乗.
+bool EnemyBase::Collision(float cx, float cy, float limit2)
+{
+	return (GetDistance2(cx, cy, m_pos.x, m_pos.y) < limit2);
+}
 
 // 次の空き位置を探す.
 int EnemyManager::Next()
@@ -274,4 +268,20 @@ char* EnemyManager::GetText()
 	// 文字列の最後は必ずNULL文字でターミネート.
 	m_pTextBuff[m_enemyMax] = NULL;
 	return m_pTextBuff;
+}
+
+// (cx, cy)の位置は敵と衝突距離だったか.
+// 衝突した場合は引数pIndexが差す場所に配列のインデックスを入れてTRUEを返す.
+// 衝突が無かった場合はFALSE返す.
+bool EnemyManager::Collision(float cx, float cy, float limit2, int* pIndex)
+{
+	for (int i = 0; i < m_enemyMax; i++) {
+		if (m_ppBuffer[i] != NULL) {
+			if (m_ppBuffer[i]->Collision(cx, cy, limit2)) {
+				*pIndex = i;
+				return true;
+			}
+		}
+	}
+	return false;
 }

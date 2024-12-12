@@ -242,7 +242,7 @@ void Player::Show() {
 		weaponrc = g_WeaponArea[m_weaponanim];
 		// プレイヤーの武器を描画
 		// 反転にも対応
-		if (m_weaponflg && m_wTex != NULL)myapp->DrawChara(pSpr, m_wTex->GetTexture(),
+		if (m_weaponflg && m_wTex != NULL)myapp->Draw(pSpr, m_wTex->GetTexture(),
 			weaponpos, weaponrc, m_weapon_w, m_weapon_h, m_scaling, false);
 	}
 	// 攻撃中でないとき
@@ -262,7 +262,7 @@ void Player::Show() {
 	if (m_pTex != NULL) {
 		// プレイヤーを描画
 		// 反転にも対応
-		myapp->DrawChara(pSpr, m_pTex->GetTexture(), pos, rc, m_w, m_h, m_scaling, false);
+		myapp->Draw(pSpr, m_pTex->GetTexture(), pos, rc, m_w, m_h, m_scaling, false);
 	}
 }
 
@@ -270,6 +270,12 @@ void Player::Show() {
 D3DXVECTOR2 Player::GetXY()
 {
 	return m_pos;
+}
+
+// 現在のプレイヤーのサイズを得る.
+float Player::GetSize()
+{
+	return m_w;
 }
 
 // 現在の武器のXY座標値を得る.

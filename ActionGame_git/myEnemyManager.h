@@ -77,6 +77,9 @@ public:
 
 	// タイマーが0以上なら有効（インライン関数）.
 	//virtual bool IsActive();
+
+	// 位置(cx,cy)との距離がlimit2以下かどうかを判定.
+	virtual bool Collision(float cx, float cy, float limit2);
 };
 
 //////////////////////////////////
@@ -141,4 +144,7 @@ public:
 	bool PPBuffer(int index);
 
 	char* GetText();				// デバッグ用に配列の状況を文字列化する.
+
+	bool Collision(float cx, float cy, float limit2, int* pIndex);
+	// ↑位置(cx, cy)からみて距離limit2以内の敵をpIndexに返却.
 };

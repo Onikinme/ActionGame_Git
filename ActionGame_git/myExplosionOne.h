@@ -13,7 +13,7 @@ private:
 public:
 	ExplosionOne() : m_posX(0.0f), m_posY(0.0f), m_ExplTimer(-1)
 	{
-		_tprintf(_T("îöî≠ê∂ê¨ addr=%p\n"), this);
+		//_tprintf(_T("îöî≠ê∂ê¨ addr=%p\n"), this);
 	}
 	virtual ~ExplosionOne();
 

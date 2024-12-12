@@ -10,6 +10,7 @@
 #include "myEnemyManager.h"
 #include "myExplosionBuffer.h"
 #include "myEnemyAAA.h"
+#include "myBossAAA.h"
 
 //#define FULLSCREEN
 
@@ -37,7 +38,10 @@ MyApp::MyApp()
 	, pPlayer_WeaponTex(NULL)	// プレイヤーの武器
 	, pMatoTex(NULL)			// 当たり判定チェック用の的.
 	, pEffectTex(NULL)			// 攻撃エフェクト
-	, pBulletTex(NULL)			// 自機弾丸.
+	//, pBulletTex(NULL)			// 自機弾丸.
+	, pBossBullet(NULL)	// ボスの弾丸.
+	, pBossMgr(NULL)
+	, tmpBossTex(NULL)//ボスtmp
 	, BossHPBar_BlackTex(NULL)
 	, BossHPBar_PinkTex(NULL)
 	, nextFireFrame(0)			// 自機が次に弾を撃てるまでの時間（フレーム）.
@@ -122,6 +126,18 @@ bool MyApp::InitApp()
 		return false;
 	}
 
+	// ボス管理クラスのオブジェクトを生成.
+	pBossMgr = new BossManager(10);
+	if (pBossMgr == NULL || !pBossMgr->Init()) {
+		return false;
+	}
+
+	// 弾丸管理クラス（敵用）のオブジェクトを生成&初期化.
+	pBossBullet = new BulletBuffer(100);
+	if (pBossBullet == NULL || !pBossBullet->Init()) {
+		return false;
+	}
+
 	// 同時爆発数最大100個分のバッファを準備.
 	pExplMgr = new ExplosionBuffer(100);
 	if (pExplMgr == NULL || !pExplMgr->Init()) {
@@ -135,7 +151,8 @@ bool MyApp::InitApp()
 
 		pPlayerTex = MyTexture::LoadTexture(pDevice, _T("data/image/player_kari.png"));
 		pPlayer_WeaponTex = MyTexture::LoadTexture(pDevice, _T("data/image/player_weapon.png"));
-		pBulletTex = MyTexture::LoadTexture(pDevice, _T("data/image/bullet.png"));
+		pEnemyBltTex = MyTexture::LoadTexture(pDevice, _T("data/image/bullet.png"));
+		tmpBossTex = MyTexture::LoadTexture(pDevice, _T("data/image/bossTexture_0.png"));
 		pMatoTex = MyTexture::LoadTexture(pDevice, _T("data/image/mato.png"));
 		pExplosionTex = MyTexture::LoadTexture(pDevice, _T("data/image/effect.png"));
 
@@ -216,6 +233,8 @@ void MyApp::ReleaseData()
 	// 動的オブジェクトの開放.
 	if (pExplMgr) { delete pExplMgr; }
 	if (pEnemyMgr) { delete pEnemyMgr; }
+	if (pBossMgr) { delete pBossMgr; }
+	if (pBossBullet) { delete pBossBullet; }
 	if (pFont) { delete pFont; }
 
 	// 入力デバイスの解放.
@@ -230,7 +249,9 @@ void MyApp::ReleaseData()
 void MyApp::ResetGameData()
 {
 	pEnemyMgr->ResetAll();
+	pBossMgr->ResetAll();
 	pExplMgr->ResetAll();
+	pBossBullet->ResetAll();
 
 	// プレイヤークラスのオブジェクトを生成
 	pPlayer = new Player(pPlayerTex, pPlayer_WeaponTex);
@@ -239,6 +260,9 @@ void MyApp::ResetGameData()
 	CreateEnemyA(300, HEIGHT - 66, 0.0f, 0.0f, 30);
 	//CreateEnemyA(200, HEIGHT - 66, 0.0f, 0.0f, 5);
 	//CreateEnemyA(600, HEIGHT - 66, 1.0f, 0.0f, 3);
+
+	//ボスの初期化
+	CreateBossA(800.0f, HEIGHT - 82.0f, 0.0f, 0.0f, 5);
 
 	playerPower = 10;
 	nextFireFrame = 0;
@@ -461,31 +485,71 @@ void MyApp::UpdatePlaying(bool playable)
 		// プレイヤーを更新、ただしすり抜け対策のため時分割する.
 		pPlayer->Update(1.0f / 10);
 
-		// プレイヤーの攻撃が終了したことを検知し、敵の被ダメージフラグをfalseにする
+		// プレイヤーの攻撃が終了したことを検知し、敵とボスの被ダメージフラグをfalseにする
 		if (pPlayer->AttackEnd()) {
 			for (int i = 0; i < pEnemyMgr->EnemyMax(); i++) {
 				if (pEnemyMgr->PPBuffer(i))pEnemyMgr->DamageFlg(false, i);
+			}
+			for (int i = 0; i < pBossMgr->BossMax(); i++) {
+				if (pBossMgr->PPBuffer(i))pBossMgr->DamageFlg(false, i);
 			}
 		}
 
 		// 敵を更新、ただしすり抜け対策のため時分割する.
 		pEnemyMgr->Update(1.0f / 10);
 
+		// 弾丸とボスを更新、ただしすり抜け対策のため時分割する.
+		for (int i = 0; i < 10; i++)
+		{
+			pBossBullet->Update(1.0f / 10);
+		}
+		pBossMgr->Update(1.0f / 10);
+
 		// 爆発には当たり判定はないので、時分割は不要.
 		pExplMgr->Update(1);
-		// 
+
+		//Debug
+		//Fire
+		if (pInput->IsPushKey(DIK_X))
+		{
+			//_tprintf(_T("xボタンが押されました\n"));
+			pBossMgr->ChangeAction(1, 0);
+		}
+		//Jump
+		if (pInput->IsPushKey(DIK_Z))
+		{
+			//_tprintf(_T("xボタンが押されました\n"));
+			pBossMgr->ChangeAction(2, 0);
+		}
+
 		// 敵と武器の当たり判定（武器を出している最中ならば）
 		for (int i = 0; i < pEnemyMgr->EnemyMax(); i++) {
 			if (pEnemyMgr->PPBuffer(i)) {
-				if (pPlayer->IsWeapon() && Collision(pPlayer->GetWeaponXY(), pPlayer->GetWeaponW() / 2, pEnemyMgr->GetXY(&i), 48.0f / 2) && !pEnemyMgr->IsDamage(i)) { // 武器の座標、武器の半径、的の座標、的の半径
+				if (pPlayer->IsWeapon() && Collision(pPlayer->GetWeaponXY(), pPlayer->GetWeaponW() / 2, pEnemyMgr->GetXY(&i), 48.0f / 2) && !pEnemyMgr->IsDamage(i)) { // 武器の座標、武器の半径、敵の座標、敵の半径
 					pEnemyMgr->DamageFlg(true, i);
-					// 中心点の距離
+					// 中心点の距離 
 					float lengthX = (pPlayer->GetWeaponXY().x + pEnemyMgr->GetXY(&i).x) / 2;
 
 					float lengthY = (pPlayer->GetWeaponXY().y + pEnemyMgr->GetXY(&i).y) / 2;
 
 					pExplMgr->Explose(lengthX, lengthY);
 					pEnemyMgr->Damage(1, i);
+				}
+			}
+		}
+
+		// ボスと武器の当たり判定（武器を出している最中ならば）
+		for (int i = 0; i < pBossMgr->BossMax(); i++) {
+			if (pBossMgr->PPBuffer(i)) {
+				if (pPlayer->IsWeapon() && Collision(pPlayer->GetWeaponXY(), pPlayer->GetWeaponW() / 2, pBossMgr->GetXY(&i), 64.0f / 2) && !pBossMgr->IsDamage(i)) { // 武器の座標、武器の半径、ボスの座標、ボスの半径
+					pBossMgr->DamageFlg(true, i);
+					// 中心点の距離 
+					float lengthX = (pPlayer->GetWeaponXY().x + pBossMgr->GetXY(&i).x) / 2;
+
+					float lengthY = (pPlayer->GetWeaponXY().y + pBossMgr->GetXY(&i).y) / 2;
+
+					pExplMgr->Explose(lengthX, lengthY);
+					pBossMgr->Damage(1, i);
 				}
 			}
 		}
@@ -591,10 +655,10 @@ HRESULT MyApp::DrawData()
 
 	pFont->DrawBmpText(txt, 20, 680, 8, 0xFFFFFFFF);
 
-	/*
-	sprintf_s(txt, "bullet:%s", pPlayerBullet->GetText());
-	pFont->DrawBmpText(txt, 20, 700, 8, 0xFFFFFFFF);
-	*/
+	
+	//sprintf_s(txt, "bullet:%s", pBossBullet->GetText());
+	//pFont->DrawBmpText(txt, 20, 500, 8, 0xFFFFFFFF);
+	
 
 	//sprintf_s(txt, "enemies:%s", pEnemyMgr->GetText());
 	//pFont->DrawBmpText(txt, 20, 500, 8, 0xFFFFFFFF);
@@ -623,6 +687,14 @@ void MyApp::DrawDataPlaying()
 	// 敵の描画.
 	pEnemyMgr->Show();
 
+	// 弾丸の表示。配列を順番に探査して表示する.
+	pBossBullet->Draw(pEnemyBltTex);
+
+	//ボス描画
+	pBossMgr->Show();
+
+	//DrawChara(pSprite, tmpBossTex->GetTexture(), D3DXVECTOR3(WIDTH - 200 - 32, 0 + 16, 0), RECT{ 0, 0, 64, 64 }, 0.0f, 0.0f, false, false);
+
 	// プレイヤーの描画.
 	pPlayer->Show();
 
@@ -633,13 +705,13 @@ void MyApp::DrawDataPlaying()
 	int u = 0;
 	float BossMaxHP = 0;
 	float BossHP = 0;
-	if (pEnemyMgr->PPBuffer(u)) {
-		BossMaxHP = pEnemyMgr->GetMaxHP(&u);
-		BossHP = pEnemyMgr->GetHP(&u);
+	if (pBossMgr->PPBuffer(u)) {
+		BossMaxHP = pBossMgr->GetMaxHP(&u);
+		BossHP = pBossMgr->GetHP(&u);
 		BossHP = BossHP / BossMaxHP * 200;
 	}
-	DrawChara(pSprite, BossHPBar_BlackTex->GetTexture(), D3DXVECTOR3(WIDTH - 200 - 32, 0 + 16, 0), RECT{ 0, 0, 200, 18 }, 0.0f, 0.0f, false, false);
-	DrawChara(pSprite, BossHPBar_PinkTex->GetTexture(), D3DXVECTOR3(WIDTH - 200 - 32, 0 + 16, 0), RECT{ 0, 0, (int)BossHP, 18 }, 0.0f, 0.0f, false, false);
+	Draw(pSprite, BossHPBar_BlackTex->GetTexture(), D3DXVECTOR3(WIDTH - 200 - 32, 0 + 16, 0), RECT{ 0, 0, 200, 18 }, 0.0f, 0.0f, false, false);
+	Draw(pSprite, BossHPBar_PinkTex->GetTexture(), D3DXVECTOR3(WIDTH - 200 - 32, 0 + 16, 0), RECT{ 0, 0, (int)BossHP, 18 }, 0.0f, 0.0f, false, false);
 }
 
 // 当たり判定（円）
@@ -662,7 +734,7 @@ bool MyApp::Collision(D3DXVECTOR2 a, float a_r, D3DXVECTOR2 b, float b_r) {
 	return false; // 当たっていない
 }
 
-void MyApp::DrawChara(ID3DXSprite* pSprite, IDirect3DTexture9* pTexture,
+void MyApp::Draw(ID3DXSprite* pSprite, IDirect3DTexture9* pTexture,
 	D3DXVECTOR3 pos, RECT rc, float textureWidth, float textureHeight, bool flipHorizontal, bool flipVertical) {
 	D3DXVECTOR2 scaling(1.0f, 1.0f); // スケール
 	D3DXVECTOR2 position(pos);     // 描画位置
@@ -703,4 +775,12 @@ void MyApp::CreateEnemyA(float x, float y, float vx, float vy, int maxhp)
 	EnemyAAA* pEnemyA = new EnemyAAA(pMatoTex);
 	pEnemyA->Init(x, y, vx, vy, maxhp);
 	pEnemyMgr->Add(pEnemyA);
+}
+
+// ボスＡを生成.
+void MyApp::CreateBossA(float x, float y, float vx, float vy, int maxhp)
+{
+	BossAAA* pBossA = new BossAAA(tmpBossTex);
+	pBossA->Init(x, y, vx, vy, maxhp);
+	pBossMgr->Add(pBossA);
 }
