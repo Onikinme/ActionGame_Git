@@ -65,7 +65,7 @@ void BossTmp::Draw()
 		//‰æ‘œ”½“]
 	}
 
-	GetApp()->Draw(GetApp()->GetSprite(), m_pTex->GetTexture(), pos, rc, size, size, !m_leftFlg, false);
+	GetApp()->Draw(GetApp()->GetSprite(), m_pTex->GetTexture(), pos, rc, size, size, !m_leftFlg, false, false);
 }
 
 /********************

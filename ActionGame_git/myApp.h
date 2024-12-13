@@ -72,13 +72,15 @@ public:
 
 	// 描画関数
 	void Draw(ID3DXSprite* pSprite, IDirect3DTexture9* pTexture,
-		D3DXVECTOR3 pos, RECT rc, float textureWidth, float textureHeight, bool flipHorizontal, bool flipVertical);
+		D3DXVECTOR3 pos, RECT rc, float textureWidth, float textureHeight, bool flipHorizontal, bool flipVertical, bool damageflg);
 	// 当たり判定（円）
 	bool Collision(D3DXVECTOR2 a, float a_r, D3DXVECTOR2 b, float b_r);
 
-	void CreateEnemyA(float x, float y, float vx, float vy, int maxhp);		// 敵Ａを生成.
+	// 敵Ａを生成.
+	void CreateEnemyA(D3DXVECTOR2 pos, D3DXVECTOR2 v_pos, float w, float h, int maxhp);
 
-	void CreateBossA(float x, float y, float vx, float vy, int maxhp);		// ボスＡを生成.
+	// ボスＡを生成.
+	void CreateBossA(float x, float y, float vx, float vy, int maxhp);
 
 private:
 	HRESULT	InitDirect3D();			// Direct3Dの初期化
@@ -100,15 +102,17 @@ private:
 	MyTexture* pPlayerTex;			// 自機.
 	MyTexture* pPlayer_WeaponTex;	// プレイヤーの武器
 	MyTexture* pMatoTex;			// 当たり判定チェック用の的.
-	//MyTexture* pBulletTex;			// 自機弾丸.
+	//MyTexture* pBulletTex;		// 自機弾丸.
 
-	BulletBuffer* pBossBullet;	// ボスの弾丸.
+	BulletBuffer* pBossBullet;		// ボスの弾丸.
 	MyTexture* pEnemyBltTex;		// 敵弾丸テクスチャ.
 	BossManager* pBossMgr;
-	MyTexture* tmpBossTex;//ボスtmp
+	MyTexture* tmpBossTex;			//ボスtmp
 
-	MyTexture* BossHPBar_BlackTex;		// ボスのHPバー（黒）
-	MyTexture* BossHPBar_PinkTex;		// ボスのHPバー（ピンク）
+	MyTexture* PlayerHPBar_Tex;		// プレイヤーのHPバー
+	MyTexture* PlayerHPBarFrame_Tex;		// プレイヤーのHPバーのフレーム
+	MyTexture* BossHPBar_Tex;		// ボスのHPバー
+	MyTexture* BossHPBarFrame_Tex;		// ボスのHPバーのフレーム
 
 	int nextFireFrame;				// 自機が次に弾を撃てるまでの時間（フレーム）.
 	UINT buttons;					// ボタンの情報.

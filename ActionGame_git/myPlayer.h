@@ -32,6 +32,7 @@ private:
 	float m_timer;				  // 生成してからの時刻.
 	float m_movetimer;			  // 移動時間
 	float m_attacktimer;		  // 攻撃時間
+	float m_damagetimer;		  // ダメージを受けてからの時刻
 	float m_w, m_h;				  // プレイヤーのサイズ
 	float m_weapon_w, m_weapon_h; // プレイヤーの武器のサイズ
 	bool player_damageflg;		  // プレイヤーがダメージを受けたか（同じ攻撃で複数回ダメージを受けないようにする）
@@ -47,6 +48,8 @@ private:
 	int m_weaponanim;			  // 武器アニメーション
 	bool m_weaponflg;			  // 武器を表示するフラグ
 
+	int Meter;                    // 必殺技のメーターnnnnnnnnn
+
 public:
 // コンストラクタ
 	Player(MyTexture* pTex, MyTexture* wTex)
@@ -60,6 +63,7 @@ public:
 		, m_timer(-1.0f)
 		, m_movetimer(-1.0f)
 		, m_attacktimer(-1.0f)
+		, m_damagetimer(-1.0f)
 		, m_w(0.0f)
 		, m_h(0.0f)
 		, m_weapon_w(0.0f)
@@ -116,7 +120,7 @@ public:
 	 int GetHP();
 
 	// ダメージを受けた時の処理
-	 void Damage(int damage);
+	 void Damage(int damage, bool direct);
 
 	// ダメージフラグを管理
 	 void DamageFlg(bool damage);

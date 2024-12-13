@@ -45,7 +45,8 @@ void Player::Init(D3DXVECTOR2 pos, D3DXVECTOR2 v_pos, float w, float h, float ww
 	m_gravity = 0.3f;				  // 重力
 	m_timer = 0.0f;					  // タイマーを0.0fにして、有効化する. 
 	m_movetimer = 0.0f;				  // タイマーを0.0fにして、有効化する. 
-	m_attacktimer = 0.0f;			  // タイマーを0.0fにして、有効化する. 
+	m_attacktimer = -1.0f;			  // タイマーを-1.0fにして、無効化する. 
+	m_damagetimer = -1.0f;			  // タイマーを-1.0fにして、無効化する. 
 }
 
 // プレイヤーの移動処理：基底クラスでは時刻を進めるだけ.
@@ -59,93 +60,93 @@ bool Player::Update(float time)
 
 	// キーボードでの操作.
 	{
-		// Aキーで左に動く
-		if (pInput->IsPushKey(DIK_A) && !pInput->IsPushKey(DIK_D)) {
-			m_scaling = true; // 左向き
-			// 空中にいて、かつ右方向への慣性が働いているとき、
-			// 左方向に動きやすくなる
-			if (!m_isGround && 0 < m_vel.x) {
-				m_vel.x -= 0.3f;
+		if (!(player_damageflg && m_damagetimer > 0.0f && m_timer - m_damagetimer < 1.0f)) {
+			// Aキーで左に動く
+			if (pInput->IsPushKey(DIK_A) && !pInput->IsPushKey(DIK_D)) {
+				m_scaling = true; // 左向き
+				// 空中にいて、かつ右方向への慣性が働いているとき、
+				// 左方向に動きやすくなる
+				if (!m_isGround && 0 < m_vel.x) {
+					m_vel.x -= 0.3f;
+				}
+				else m_vel.x -= 0.1f;
+				if (m_vel.x < -5.0f)m_vel.x = -5.0f;
 			}
-			else m_vel.x -= 0.1f;
-			if (m_vel.x < -5.0f)m_vel.x = -5.0f;
-		}
-		// Dキーで右に動く
-		else if (pInput->IsPushKey(DIK_D)) {
-			m_scaling = false; // 右向き
-			// 空中にいて、かつ左方向への慣性が働いているとき、
-			// 右方向に動きやすくなる
-			if (!m_isGround && 0 > m_vel.x) {
-				m_vel.x += 0.3f;
+			// Dキーで右に動く
+			else if (pInput->IsPushKey(DIK_D)) {
+				m_scaling = false; // 右向き
+				// 空中にいて、かつ左方向への慣性が働いているとき、
+				// 右方向に動きやすくなる
+				if (!m_isGround && 0 > m_vel.x) {
+					m_vel.x += 0.3f;
+				}
+				else m_vel.x += 0.1f;
+				if (m_vel.x > 5.0f)m_vel.x = 5.0f;
 			}
-			else m_vel.x += 0.1f;
-			if (m_vel.x > 5.0f)m_vel.x = 5.0f;
-		}
 
-		if (pInput->IsPushKey(DIK_A) || pInput->IsPushKey(DIK_D)) {
-			if (!m_move) {
-				m_movetimer = m_timer;
-				m_move = true;
+			if (pInput->IsPushKey(DIK_A) || pInput->IsPushKey(DIK_D)) {
+				if (!m_move) {
+					m_movetimer = m_timer;
+					m_move = true;
+				}
 			}
-		}
-		else {
-			//pData->movetimer = -1.0f;
-			m_move = false;
+			else {
+				m_move = false;
+			}
+
+			// キーを離した時の減速調整
+			if (!pInput->IsPushKey(DIK_A) && 0 > m_vel.x) {
+				if (m_isGround) { // 地上ではブレーキが良く効く
+					m_vel.x += 0.1f;
+					m_vel.x *= 0.95f;
+				}
+				else { // 空中では横方向に慣性が働くため、ブレーキが効きづらい
+					m_vel.x += 0.01f;
+					m_vel.x *= 0.99f;
+				}
+				if (m_vel.x > 0) m_vel.x = 0;
+			}
+			if (!pInput->IsPushKey(DIK_D) && 0 < m_vel.x) {
+				if (m_isGround) { // 地上ではブレーキが良く効く
+					m_vel.x -= 0.1f;
+					m_vel.x *= 0.95f;
+				}
+				else { // 空中では横方向に慣性が働くため、ブレーキが効きづらい
+					m_vel.x -= 0.01f;
+					m_vel.x *= 0.99f;
+				}
+				if (m_vel.x < 0) m_vel.x = 0;
+			}
 		}
 
 		// 移動中
-		if (m_movetimer > 0.0f) {
-			if ((int)(m_timer - m_movetimer) % 4 >= 3) {
-				m_moveanim = 2;
-			}
-			else if ((int)(m_timer - m_movetimer) % 4 >= 2) {
-				m_moveanim = 1;
-			}
-			else if ((int)(m_timer - m_movetimer) % 4 >= 1) {
-				m_moveanim = 0;
-			}
-			else if ((int)(m_timer - m_movetimer) % 4 >= 0) {
-				m_moveanim = 1;
-			}
+		if ((int)(m_timer - m_movetimer) % 4 >= 3) {
+			m_moveanim = 2;
+		}
+		else if ((int)(m_timer - m_movetimer) % 4 >= 2) {
+			m_moveanim = 1;
+		}
+		else if ((int)(m_timer - m_movetimer) % 4 >= 1) {
+			m_moveanim = 0;
+		}
+		else if ((int)(m_timer - m_movetimer) % 4 >= 0) {
+			m_moveanim = 1;
 		}
 
-		// キーを離した時の減速調整
-		if (!pInput->IsPushKey(DIK_A) && 0 > m_vel.x) {
-			if (m_isGround) { // 地上ではブレーキが良く効く
-				m_vel.x += 0.1f;
-				m_vel.x *= 0.95f;
-			}
-			else { // 空中では横方向に慣性が働くため、ブレーキが効きづらい
-				m_vel.x += 0.01f;
-				m_vel.x *= 0.99f;
-			}
-			if (m_vel.x > 0) m_vel.x = 0;
-		}
-		if (!pInput->IsPushKey(DIK_D) && 0 < m_vel.x) {
-			if (m_isGround) { // 地上ではブレーキが良く効く
-				m_vel.x -= 0.1f;
-				m_vel.x *= 0.95f;
-			}
-			else { // 空中では横方向に慣性が働くため、ブレーキが効きづらい
-				m_vel.x -= 0.01f;
-				m_vel.x *= 0.99f;
-			}
-			if (m_vel.x < 0) m_vel.x = 0;
-		}
-		m_pos.x += m_vel.x;
-
-		if (m_pos.x < 0) {
+		if (m_pos.x * SIZE < 0) {
 			m_pos.x = 0;
 			m_vel.x = 0;
 		}
-		if (m_pos.x > WIDTH - m_w) {
-			m_pos.x = WIDTH - m_w;
+		if (m_pos.x > WIDTH - m_w * SIZE) {
+			m_pos.x = WIDTH - m_w * SIZE;
 			m_vel.x = 0;
 		}
 
+		m_pos.x += m_vel.x;
+
 		// プレイヤーが地面に着いていたらSPACEキーでジャンプ可能
 		if (m_isGround) {
-			if (pInput->IsPushKey(DIK_SPACE) && m_pos.y == HEIGHT - 50 && !m_jumpbutton) {
+			if (pInput->IsPushKey(DIK_SPACE) && m_pos.y == HEIGHT - 64 * SIZE && !m_jumpbutton) {
 				m_vel.y = -10.0f;  // 初速度の設定
 				//Y座標の更新
 				m_pos.y += m_vel.y;
@@ -166,13 +167,13 @@ bool Player::Update(float time)
 		}
 
 		// ジャンプボタン長押しでジャンプし続けてしまわないようにチェック
-		if (!pInput->IsPushKey(DIK_SPACE) && m_jumpbutton && m_pos.y == HEIGHT - 50) {
+		if (!pInput->IsPushKey(DIK_SPACE) && m_jumpbutton && m_pos.y == HEIGHT - 64 * SIZE) {
 			m_jumpbutton = false;
 		}
 
 		// 地面に着いたかチェック
-		if (m_pos.y >= HEIGHT - 50) {
-			m_pos.y = HEIGHT - 50;
+		if (m_pos.y >= HEIGHT - 64 * SIZE) {
+			m_pos.y = HEIGHT - 64 * SIZE;
 			m_isGround = true;
 			m_shortjump = false;
 		}
@@ -214,7 +215,7 @@ bool Player::Update(float time)
 	// 武器の座標は、プレイヤーの進行方向に設置する
 	int scale = 1;
 	if (m_scaling)scale = -1;
-	m_weapon_pos = D3DXVECTOR2(m_pos.x - 8.0f + 30 * scale, m_pos.y - 8.0f);
+	m_weapon_pos = D3DXVECTOR2(m_pos.x - (8.0f * SIZE) + 30 * SIZE * scale, m_pos.y - 8.0f * SIZE);
 
 	return true;
 }
@@ -243,7 +244,7 @@ void Player::Show() {
 		// プレイヤーの武器を描画
 		// 反転にも対応
 		if (m_weaponflg && m_wTex != NULL)myapp->Draw(pSpr, m_wTex->GetTexture(),
-			weaponpos, weaponrc, m_weapon_w, m_weapon_h, m_scaling, false);
+			weaponpos, weaponrc, m_weapon_w, m_weapon_h, m_scaling, false, false);
 	}
 	// 攻撃中でないとき
 	else {
@@ -262,7 +263,25 @@ void Player::Show() {
 	if (m_pTex != NULL) {
 		// プレイヤーを描画
 		// 反転にも対応
-		myapp->Draw(pSpr, m_pTex->GetTexture(), pos, rc, m_w, m_h, m_scaling, false);
+
+		bool damageflg = false;
+		// ダメージを受けた時の点滅
+		if (player_damageflg && m_damagetimer > 0.0f) {
+			if (m_timer - m_damagetimer < 0.5f) damageflg = true;
+			else if (m_timer - m_damagetimer < 1.0f) {}
+			else if (m_timer - m_damagetimer < 1.5f) damageflg = true;
+			else if (m_timer - m_damagetimer < 2.0f) {}
+			else if (m_timer - m_damagetimer < 2.5f) damageflg = true;
+			else if (m_timer - m_damagetimer < 3.0f) {}
+			else if (m_timer - m_damagetimer < 3.5f) damageflg = true;
+			else if (m_timer - m_damagetimer < 4.0f) {}
+			else if (m_timer - m_damagetimer < 4.5f) damageflg = true;
+			else {
+				m_damagetimer = -1.0f;
+				DamageFlg(false);
+			}
+		}
+		myapp->Draw(pSpr, m_pTex->GetTexture(), pos, rc, m_w, m_h, m_scaling, false, damageflg);
 	}
 }
 
@@ -309,9 +328,13 @@ int Player::GetHP()
 }
 
 // ダメージを受けた時の処理
-void Player::Damage(int damage)
+void Player::Damage(int damage, bool direct)
 {
+	m_damagetimer = m_timer;
+	if(direct)m_vel.x = -5.0f;
+	else m_vel.x = 5.0f;
 	HP -= damage;
+	if (HP < 0) HP = 0;
 }
 
 // ダメージフラグを管理

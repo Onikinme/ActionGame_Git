@@ -18,6 +18,7 @@ protected:
 	MyTexture* m_pTex;		// 表示するテクスチャ.
 	D3DXVECTOR2 m_pos;		// 敵の座標
 	D3DXVECTOR2 m_vel;		// 敵の移動座標
+	float m_w, m_h;				  // 敵のサイズ
 	int MaxHP;				// 敵の最大体力
 	int HP;					// 敵の現在体力
 	float m_timer;			// 生成してからの時刻.
@@ -51,7 +52,7 @@ public:
 	virtual char Getch() { return '*'; }
 
 	// 敵の初期化.
-	virtual void Init(float x, float y, float vx, float vy, int maxhp);
+	virtual void Init(D3DXVECTOR2 pos, D3DXVECTOR2 v_pos, float w, float h, int maxhp);
 
 	// キャラクタを表示する.
 	virtual void Show();
@@ -59,6 +60,9 @@ public:
 	// 現在のXY座標値を得る.
 	//void GetXY(float& x, float& y);
 	virtual D3DXVECTOR2 GetXY();
+
+	// 現在のプレイヤーのサイズを得る.
+	virtual float GetSize();
 
 	// 最大HPを得る
 	virtual int GetMaxHP();
@@ -121,6 +125,9 @@ public:
 
 	// 現在のXY座標値を得る.
 	D3DXVECTOR2 GetXY(int* index);
+
+	// 現在のプレイヤーのサイズを得る.
+	float GetSize();
 
 	// 最大HPを得る
 	int GetMaxHP(int* index);

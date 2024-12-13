@@ -17,11 +17,12 @@ bool EnemyBase::Update(float time)
 }
 
 // 敵の初期化.
-void EnemyBase::Init(float x, float y, float vx, float vy, int maxhp)
+void EnemyBase::Init(D3DXVECTOR2 pos, D3DXVECTOR2 v_pos, float w, float h, int maxhp)
 {
 	// x (初期位置X), y (初期位置Y)
-	m_pos = D3DXVECTOR2(x, y);
-	m_vel = D3DXVECTOR2(vx, vy);
+	m_pos = pos;
+	m_vel = v_pos;
+	m_w = w, m_h = h;				  // 敵のサイズ
 	MaxHP = maxhp;
 	HP = MaxHP;
 	enemy_damageflg = false;
@@ -38,7 +39,7 @@ void EnemyBase::Show()
 	D3DXVECTOR3 pos(m_pos.x, m_pos.y, 0);
 	MyApp* myapp = GetApp();
 	ID3DXSprite* pSpr = GetApp()->GetSprite();
-	myapp->Draw(pSpr, m_pTex->GetTexture(), pos, { 0, 0, 48, 48 }, 48.0f, 48.0f, false, false);
+	myapp->Draw(pSpr, m_pTex->GetTexture(), pos, { 0, 0, 48, 48 }, 48.0f, 48.0f, false, false, false);
 }
 
 // 現在のXY座標値を得る.
@@ -47,6 +48,12 @@ D3DXVECTOR2 EnemyBase::GetXY()
 	// 練習２
 	// TODO メンバ変数の値を取得する処理を記述してください.
 	return m_pos;
+}
+
+// 現在の敵のサイズを得る.
+float EnemyBase::GetSize()
+{
+	return m_w;
 }
 
 // 最大HPを得る

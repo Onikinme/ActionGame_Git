@@ -42,8 +42,8 @@ MyApp::MyApp()
 	, pBossBullet(NULL)	// ボスの弾丸.
 	, pBossMgr(NULL)
 	, tmpBossTex(NULL)//ボスtmp
-	, BossHPBar_BlackTex(NULL)
-	, BossHPBar_PinkTex(NULL)
+	, PlayerHPBar_Tex(NULL)
+	, BossHPBar_Tex(NULL)
 	, nextFireFrame(0)			// 自機が次に弾を撃てるまでの時間（フレーム）.
 	, buttons(0)				// ボタンの情報.
 	, pPlayer(NULL)
@@ -156,8 +156,10 @@ bool MyApp::InitApp()
 		pMatoTex = MyTexture::LoadTexture(pDevice, _T("data/image/mato.png"));
 		pExplosionTex = MyTexture::LoadTexture(pDevice, _T("data/image/effect.png"));
 
-		BossHPBar_BlackTex = MyTexture::LoadTexture(pDevice, _T("data/image/BossHPbar_Black.png"));
-		BossHPBar_PinkTex = MyTexture::LoadTexture(pDevice, _T("data/image/BossHPbar_Pink.png"));
+		PlayerHPBar_Tex = MyTexture::LoadTexture(pDevice, _T("data/image/playerHPbar.png"));
+		PlayerHPBarFrame_Tex = MyTexture::LoadTexture(pDevice, _T("data/image/playerHPbarframe.png"));
+		BossHPBar_Tex = MyTexture::LoadTexture(pDevice, _T("data/image/bossHPbar.png"));
+		BossHPBarFrame_Tex = MyTexture::LoadTexture(pDevice, _T("data/image/bossHPbarframe.png"));
 
 		// 数値表示用テクスチャの読み込み.
 		MyTexture* pTex = MyTexture::LoadTexture(pDevice, _T("data/image/numbers.png"));
@@ -255,14 +257,14 @@ void MyApp::ResetGameData()
 
 	// プレイヤークラスのオブジェクトを生成
 	pPlayer = new Player(pPlayerTex, pPlayer_WeaponTex);
-	pPlayer->Init(D3DXVECTOR2(WIDTH / 2, HEIGHT - 50), D3DXVECTOR2(0.0f, -10.0f), 32.0f, 32.0f, 48.0f, 48.0f, 50);
+	pPlayer->Init(D3DXVECTOR2(WIDTH / 2, HEIGHT - 64 * SIZE), D3DXVECTOR2(0.0f, -10.0f), 32.0f, 32.0f, 48.0f, 48.0f, 50);
 
-	CreateEnemyA(300, HEIGHT - 66, 0.0f, 0.0f, 30);
+	CreateEnemyA(D3DXVECTOR2(300, HEIGHT - 80 * SIZE), D3DXVECTOR2(0.0f, 0.0f), 48, 48, 30);
 	//CreateEnemyA(200, HEIGHT - 66, 0.0f, 0.0f, 5);
 	//CreateEnemyA(600, HEIGHT - 66, 1.0f, 0.0f, 3);
 
 	//ボスの初期化
-	CreateBossA(800.0f, HEIGHT - 82.0f, 0.0f, 0.0f, 5);
+	CreateBossA(800.0f, HEIGHT - 96.0f * SIZE, 0.0f, 0.0f, 5);
 
 	playerPower = 10;
 	nextFireFrame = 0;
@@ -538,6 +540,24 @@ void MyApp::UpdatePlaying(bool playable)
 			}
 		}
 
+		// 敵とプレイヤーの当たり判定
+		for (int i = 0; i < pEnemyMgr->EnemyMax(); i++) {
+			if (pEnemyMgr->PPBuffer(i)) {
+				if (Collision(pPlayer->GetXY(), pPlayer->GetSize() / 2, pEnemyMgr->GetXY(&i), 48.0f / 2) && !pPlayer->IsDamage()) { // 武器の座標、武器の半径、敵の座標、敵の半径
+					pPlayer->DamageFlg(true);
+					// 中心点の距離 
+					float lengthX = (pPlayer->GetXY().x + pEnemyMgr->GetXY(&i).x) / 2;
+
+					float lengthY = (pPlayer->GetXY().y + pEnemyMgr->GetXY(&i).y) / 2;
+
+					pExplMgr->Explose(lengthX, lengthY);
+					bool direct = false;
+					if (lengthX > pPlayer->GetXY().x - pPlayer->GetSize() / 4) direct = true;
+					pPlayer->Damage(1, direct);
+				}
+			}
+		}
+
 		// ボスと武器の当たり判定（武器を出している最中ならば）
 		for (int i = 0; i < pBossMgr->BossMax(); i++) {
 			if (pBossMgr->PPBuffer(i)) {
@@ -550,6 +570,24 @@ void MyApp::UpdatePlaying(bool playable)
 
 					pExplMgr->Explose(lengthX, lengthY);
 					pBossMgr->Damage(1, i);
+				}
+			}
+		}
+
+		// ボスとプレイヤーの当たり判定
+		for (int i = 0; i < pBossMgr->BossMax(); i++) {
+			if (pBossMgr->PPBuffer(i)) {
+				if (Collision(pPlayer->GetXY(), pPlayer->GetSize() / 2, pBossMgr->GetXY(&i), 64.0f / 2) && !pPlayer->IsDamage()) { // 武器の座標、武器の半径、敵の座標、敵の半径
+					pPlayer->DamageFlg(true);
+					// 中心点の距離 
+					float lengthX = (pPlayer->GetXY().x + pBossMgr->GetXY(&i).x) / 2;
+
+					float lengthY = (pPlayer->GetXY().y + pBossMgr->GetXY(&i).y) / 2;
+
+					pExplMgr->Explose(lengthX, lengthY);
+					bool direct = false;
+					if (lengthX > pPlayer->GetXY().x - pPlayer->GetSize() / 4) direct = true;
+					pPlayer->Damage(1, direct);
 				}
 			}
 		}
@@ -701,6 +739,20 @@ void MyApp::DrawDataPlaying()
 	// 爆発の描画
 	pExplMgr->Draw(pExplosionTex);
 
+	// プレイヤーのHPバーを更新
+	float PlayerMaxHP = 0;
+	float PlayerHP = 0;
+	PlayerMaxHP = pPlayer->GetMaxHP();
+	PlayerHP = pPlayer->GetHP();
+		PlayerHP = PlayerHP / PlayerMaxHP * 100;
+	/*
+	Draw(pSprite, PlayerHPBar_Tex->GetTexture(), D3DXVECTOR3(0 + 36, HEIGHT - 36, 0), RECT{ 0, 0, 100, 18 }, 0.0f, 0.0f, false, false);
+	Draw(pSprite, PlayerHPBar_Tex->GetTexture(), D3DXVECTOR3(0 + 36, HEIGHT - 36, 0), RECT{ 0, 18, (int)PlayerHP, 36 }, 0.0f, 0.0f, false, false);
+	*/
+	Draw(pSprite, PlayerHPBarFrame_Tex->GetTexture(), D3DXVECTOR3(0, HEIGHT - 24 * SIZE, 0), RECT{ 0, 0, 138, 24 }, 0.0f, 0.0f, false, false, false);
+	Draw(pSprite, PlayerHPBar_Tex->GetTexture(), D3DXVECTOR3(0 + 35 * SIZE, HEIGHT - 21 * SIZE, 0), RECT{ 0, 0, 100, 18 }, 0.0f, 0.0f, false, false, false);
+	Draw(pSprite, PlayerHPBar_Tex->GetTexture(), D3DXVECTOR3(0 + 35 * SIZE, HEIGHT - 21 * SIZE, 0), RECT{ 0, 18, (int)PlayerHP, 36 }, 0.0f, 0.0f, false, false, false);
+
 	// ボスのHPバーを更新
 	int u = 0;
 	float BossMaxHP = 0;
@@ -710,20 +762,26 @@ void MyApp::DrawDataPlaying()
 		BossHP = pBossMgr->GetHP(&u);
 		BossHP = BossHP / BossMaxHP * 200;
 	}
-	Draw(pSprite, BossHPBar_BlackTex->GetTexture(), D3DXVECTOR3(WIDTH - 200 - 32, 0 + 16, 0), RECT{ 0, 0, 200, 18 }, 0.0f, 0.0f, false, false);
-	Draw(pSprite, BossHPBar_PinkTex->GetTexture(), D3DXVECTOR3(WIDTH - 200 - 32, 0 + 16, 0), RECT{ 0, 0, (int)BossHP, 18 }, 0.0f, 0.0f, false, false);
+	/*
+	Draw(pSprite, BossHPBarFrame_Tex->GetTexture(), D3DXVECTOR3(WIDTH - 238 - 33, 0 + 15, 0), RECT{ 0, 0, 238, 24 }, 0.0f, 0.0f, false, false);
+	Draw(pSprite, BossHPBar_Tex->GetTexture(), D3DXVECTOR3(WIDTH - 200 - 36, 0 + 18, 0), RECT{ 0, 0, 200, 18 }, 0.0f, 0.0f, false, false);
+	Draw(pSprite, BossHPBar_Tex->GetTexture(), D3DXVECTOR3(WIDTH - 200 - 36, 0 + 18, 0), RECT{ 200 - (int)BossHP, 18, 200, 36 }, 200.0f, 0.0f, true, false);
+	*/
+	Draw(pSprite, BossHPBarFrame_Tex->GetTexture(), D3DXVECTOR3(WIDTH - 238 * SIZE, 0, 0), RECT{ 0, 0, 238, 24 }, 0.0f, 0.0f, false, false, false);
+	Draw(pSprite, BossHPBar_Tex->GetTexture(), D3DXVECTOR3(WIDTH - 200 * SIZE - 3 * SIZE, 0 + 3 * SIZE, 0), RECT{ 0, 0, 200, 18 }, 0.0f, 0.0f, false, false, false);
+	Draw(pSprite, BossHPBar_Tex->GetTexture(), D3DXVECTOR3(WIDTH - 200 * SIZE - 3 * SIZE, 0 + 3 * SIZE, 0), RECT{ 200 - (int)BossHP, 18, 200, 36 }, 200.0f, 0.0f, true, false, false);
 }
 
 // 当たり判定（円）
 bool MyApp::Collision(D3DXVECTOR2 a, float a_r, D3DXVECTOR2 b, float b_r) {
 	// 中心点の距離
-	float lengthX = (a.x + a_r) - (b.x + b_r);
+	float lengthX = (a.x + a_r * SIZE) - (b.x + b_r * SIZE);
 
-	float lengthY = (a.y + a_r) - (b.y + b_r);
+	float lengthY = (a.y + a_r * SIZE) - (b.y + b_r * SIZE);
 	float centerDistance = sqrtf(lengthX * lengthX + lengthY * lengthY);
 
 	//半径の和
-	float radiusSum = a_r + b_r;
+	float radiusSum = a_r * SIZE + b_r * SIZE;
 
 	//中心点の距離より半径の和のほうが大きい
 	if (centerDistance <= radiusSum)
@@ -734,24 +792,25 @@ bool MyApp::Collision(D3DXVECTOR2 a, float a_r, D3DXVECTOR2 b, float b_r) {
 	return false; // 当たっていない
 }
 
+// 描画関数
 void MyApp::Draw(ID3DXSprite* pSprite, IDirect3DTexture9* pTexture,
-	D3DXVECTOR3 pos, RECT rc, float textureWidth, float textureHeight, bool flipHorizontal, bool flipVertical) {
-	D3DXVECTOR2 scaling(1.0f, 1.0f); // スケール
+	D3DXVECTOR3 pos, RECT rc, float textureWidth, float textureHeight, bool flipHorizontal, bool flipVertical, bool damageflg) {
+	D3DXVECTOR2 scaling(SIZE, SIZE); // スケール
 	D3DXVECTOR2 position(pos);     // 描画位置
 	D3DXVECTOR2 spriteCenter(0.0f, 0.0f); // 基準点（画像の左上）
 
 	// 横反転
 	if (flipHorizontal) {
-		scaling.x = -1.0f;
+		scaling.x = -SIZE;
 		spriteCenter.x = textureWidth; // 横方向の基準を右端に
-		position.x += textureWidth;
+		position.x += textureWidth * SIZE;
 	}
 
 	// 縦反転
 	if (flipVertical) {
-		scaling.y = -1.0f;
+		scaling.y = -SIZE;
 		spriteCenter.y = textureHeight; // 縦方向の基準を下端に
-		position.y += textureWidth;
+		position.y += textureWidth * SIZE;
 	}
 
 	// 変換行列を設定
@@ -761,7 +820,8 @@ void MyApp::Draw(ID3DXSprite* pSprite, IDirect3DTexture9* pTexture,
 
 	// 描画
 	pSprite->Begin(D3DXSPRITE_ALPHABLEND);
-	pSprite->Draw(pTexture, &rc, NULL, NULL, D3DCOLOR_XRGB(255, 255, 255));
+	if (damageflg)pSprite->Draw(pTexture, &rc, NULL, NULL, D3DCOLOR_XRGB(255, 0, 0));
+	else pSprite->Draw(pTexture, &rc, NULL, NULL, D3DCOLOR_XRGB(255, 255, 255));
 	pSprite->End();
 
 	// 変換行列をリセット
@@ -770,10 +830,10 @@ void MyApp::Draw(ID3DXSprite* pSprite, IDirect3DTexture9* pTexture,
 }
 
 // 敵Ａを生成.
-void MyApp::CreateEnemyA(float x, float y, float vx, float vy, int maxhp)
+void MyApp::CreateEnemyA(D3DXVECTOR2 pos, D3DXVECTOR2 v_pos, float w, float h, int maxhp)
 {
 	EnemyAAA* pEnemyA = new EnemyAAA(pMatoTex);
-	pEnemyA->Init(x, y, vx, vy, maxhp);
+	pEnemyA->Init(pos, v_pos,w, h,  maxhp);
 	pEnemyMgr->Add(pEnemyA);
 }
 

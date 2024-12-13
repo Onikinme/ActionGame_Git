@@ -19,7 +19,7 @@ void ExplosionOne::Update(int time)
 
 	// ８パターンのアニメーションを５フレーム毎に更新するので４０フレームで爆発アニメを終了させる.
 	m_ExplTimer += time;
-	if (m_ExplTimer > 20)
+	if (m_ExplTimer > 10)
 	{
 		m_ExplTimer = -1;// 負の値で、活動停止状態とする.
 	}
@@ -43,12 +43,12 @@ void ExplosionOne::Draw(MyTexture* pTex)
 	//D3DXVECTOR3 cnt(48.f, 48.f, 0.f);		// 画像のセンター位置を指定.
 	D3DXVECTOR3 pos(m_posX, m_posY, 0.f);	// 表示位置を指定.
 
-	int animTime = nTime / 10;	// ５フレーム毎に更新.
+	int animTime = nTime / 5;	// ５フレーム毎に更新.
 	int anim = animTime % 2;	// ８パターンのアニメーション.　配列のオーバーアクセス回避のため剰余算にしておく.
 	//int anim = animTime % 9;	// ９パターンのアニメーション.　配列のオーバーアクセス回避のため剰余算にしておく.
 	//pSpr->Draw(pTex->GetTexture(), &(rcExplImageUV[anim]), &cnt, &pos, 0xFFFFFFFF);
 
 	MyApp* myapp = GetApp();
 	ID3DXSprite* pSpr = GetApp()->GetSprite();
-	myapp->Draw(pSpr, pTex->GetTexture(), pos, rcExplImageUV[anim], 64.0f, 64.0f, false, false);
+	myapp->Draw(pSpr, pTex->GetTexture(), pos, rcExplImageUV[anim], 64.0f, 64.0f, false, false, false);
 }
