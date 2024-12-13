@@ -18,9 +18,9 @@ protected:
 
 	int   m_hp;             //  耐久値
 	float m_actionTimer;    //攻撃中の時間	
-	bool  m_actionFlg;      //行動をしているかどうかのフラグb
+	bool  m_actionFlg;      //行動をしているかどうかのフラグ
 	int   m_actionNum;      //行動パターンの添え字
-	bool m_leftFlg;         //True:プレイヤーはボスの左側 False:プレイヤーはボスの右側
+	bool  m_leftFlg;         //True:プレイヤーはボスの左側 False:プレイヤーはボスの右側
 
 	// このクラスは抽象クラスなので、派生クラス以外からはnewできないようにする.
 	// そのため、コンストラクタをprotectedエリアに記述する.

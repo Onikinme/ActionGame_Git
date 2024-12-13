@@ -117,14 +117,9 @@ bool BossTmp::Collision(float cx, float cy, float limit2)
 //アクション決定
 void BossTmp::ChangeAction(int a)
 {
-	//アクションが終わっている(もしくはしていない)かつあったm_attackTimerが正でない時
-	if (!m_actionFlg && m_actionTimer < 0)
-	{
 		m_actionTimer = m_timer;
 		m_actionFlg = true;
 		m_actionNum = a;
-	}
-
 }
 
 //攻撃
@@ -212,7 +207,7 @@ void BossTmp::Jump()
 //プレイヤーの方向に歩く
 void BossTmp::Move()
 {
-	D3DXVECTOR2 playerpos;
+	D3DXVECTOR2 playerpos = {0,0};
 	GetApp()->GetPlayerPos(playerpos);
 	if (!m_actionFlg)
 	{
@@ -230,7 +225,7 @@ void BossTmp::Move()
 
 			m_posX += vx * speed;
 
-			int time = (int)(m_timer / 40);			// 経過時間を10フレーム単位に換算.
+			int time = (int)(m_timer / 2);			// 経過時間を10フレーム単位に換算.
 			int anim = time % 2 + 1;					// テクスチャアニメーションを8パターンで.
 			m_animNum = anim;
 		}
