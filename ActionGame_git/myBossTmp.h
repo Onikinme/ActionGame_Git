@@ -11,6 +11,7 @@ protected:
 	float m_velX, m_velY;	// XY方向への速度成分.
 	float m_timer;			// 生成してからの時刻.
 	int   m_animNum;        //ボスのアニメーションの添え字
+	float m_damageTimer;    //ダメージのアニメーション
 
 	// 前川祐毅　追加
 	int   m_maxhp;          //  最大耐久値
@@ -38,7 +39,7 @@ protected:
 		, m_actionFlg(false)
 		, m_actionNum(0)
 		, m_leftFlg(true)
-
+		, m_damageTimer(-1.0f)
 		// 前川祐毅　追加
 		, m_maxhp(0)
 		, m_boss_damageflg(false)
