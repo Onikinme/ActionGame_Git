@@ -19,14 +19,16 @@ class BossAAA : public BossTmp
 private:
 	float m_nearTimer;//Playerとの近距離の時間を図る
 	float m_farTimer;//Playerとの遠距離の時間を図る
+	bool  m_fireflg; //true:fireが画面上,false:画面内にfire無し
 public:
 	// BossAAAは親クラスのコンストラクタを明示的に指定している.
 	// BossTmp(pTex)が無いと、BossTmp()を呼び出すことになるが.
 	// 引数無しのコンストラクタBossTmp::BossTmp()は存在しないので.
 	// コンパイルエラーが出る.
 	BossAAA(MyTexture* pTex) : BossTmp(pTex), 
-		                       m_nearTimer(0.0f),
-		                       m_farTimer(0.0f)
+	 m_nearTimer(0.0f),
+	 m_farTimer(0.0f),
+	 m_fireflg(false)
 	{
 	}
 	~BossAAA() override

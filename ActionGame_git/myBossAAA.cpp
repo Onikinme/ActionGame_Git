@@ -77,7 +77,7 @@ void BossAAA::Attack() {
 			m_actionFlg = false;
 			m_animNum = 0;
 			m_actionNum = 0;
-
+			m_fireflg = false;
 
 		}
 	}
@@ -90,21 +90,42 @@ void BossAAA::Fire()
 	炎を吐き出す
 	FireクラスもしくはBulletクラスから弾オブジェクトを生成する。
 	*/
-	_tprintf(_T("発射\n"));
-
-	BulletOne* pBulletOne = GetApp()->GetEneBltBuf()->Next();
-	if (pBulletOne != NULL)
+	if (!m_fireflg)
 	{
-		float ADx = 10.0f;
-		float fXSpeed = -5.0f;
-		if (!m_leftFlg)//プレイヤーが右側
+		_tprintf(_T("発射\n"));
+
+		BulletOne* pBulletOne = GetApp()->GetEneBltBuf()->Next();
+		if (pBulletOne != NULL)
 		{
-			fXSpeed *= -1;
-			ADx *= -1;
+			D3DXVECTOR2 playerpos;
+			GetApp()->GetPlayerPos(playerpos);
+			float vx =  playerpos.x - m_posX;
+			float vy =  playerpos.y - m_posY;
+			float distance = sqrt(vx * vx + vy * vy);
+			float dx = vx / distance;
+			float dy = vy / distance;
+
+			float ADx = 20.0f;
+			if (!m_leftFlg)//プレイヤーが右側
+			{
+				ADx *= -1;
+			}
+			float ADy = -25.0f;
+
+			float speed = 5.0f;
+			float fXSpeed = speed * dx;
+			float fYSpeed = speed * dy;
+
+			pBulletOne->Init(m_posX - ADx, m_posY - ADy, fXSpeed, fYSpeed);
+			m_fireflg = true;
 		}
-		float fYSpeed = 0.0f;
-		pBulletOne->Init(m_posX - ADx, m_posY, fXSpeed, -fYSpeed);
+		
 	}
+	else
+	{
+		//nothing to do
+	}
+	
 
 }
 

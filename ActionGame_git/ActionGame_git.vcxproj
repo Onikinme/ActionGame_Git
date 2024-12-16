@@ -143,6 +143,7 @@
     <ClCompile Include="myApp.cpp" />
     <ClCompile Include="myBitmapFont.cpp" />
     <ClCompile Include="myBossAAA.cpp" />
+    <ClCompile Include="myBossBBB.cpp" />
     <ClCompile Include="myBossTmp.cpp" />
     <ClCompile Include="myBulletBuffer.cpp" />
     <ClCompile Include="myBulletOne.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="myApp.h" />
     <ClInclude Include="myBitmapFont.h" />
     <ClInclude Include="myBossAAA.h" />
+    <ClInclude Include="myBossBBB.h" />
     <ClInclude Include="myBossTmp.h" />
     <ClInclude Include="myBulletBuffer.h" />
     <ClInclude Include="myBulletOne.h" />

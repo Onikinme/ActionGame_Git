@@ -181,7 +181,7 @@ void BossTmp::Jump()
 			else
 			{
 				//地面に設置したら→条件変更の可能性あり
-				if (m_posY <= HEIGHT - 88.0f)
+				if (m_posY <= HEIGHT - 160.0f * SIZE)
 				{
 					m_posY += fYSpeed;
 				}
