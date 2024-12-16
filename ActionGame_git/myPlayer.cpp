@@ -146,7 +146,7 @@ bool Player::Update(float time)
 
 		// プレイヤーが地面に着いていたらSPACEキーでジャンプ可能
 		if (m_isGround) {
-			if (pInput->IsPushKey(DIK_SPACE) && m_pos.y == HEIGHT - 64 * SIZE && !m_jumpbutton) {
+			if (pInput->IsPushKey(DIK_SPACE) && !m_jumpbutton) {
 				m_vel.y = -10.0f;  // 初速度の設定
 				//Y座標の更新
 				m_pos.y += m_vel.y;
@@ -167,7 +167,7 @@ bool Player::Update(float time)
 		}
 
 		// ジャンプボタン長押しでジャンプし続けてしまわないようにチェック
-		if (!pInput->IsPushKey(DIK_SPACE) && m_jumpbutton && m_pos.y == HEIGHT - 64 * SIZE) {
+		if (!pInput->IsPushKey(DIK_SPACE) && m_jumpbutton && m_isGround) {
 			m_jumpbutton = false;
 		}
 
@@ -176,6 +176,7 @@ bool Player::Update(float time)
 			m_pos.y = HEIGHT - 64 * SIZE;
 			m_isGround = true;
 			m_shortjump = false;
+			m_vel.y = 0;
 		}
 
 		// Pキーで攻撃
@@ -244,7 +245,7 @@ void Player::Show() {
 		// プレイヤーの武器を描画
 		// 反転にも対応
 		if (m_weaponflg && m_wTex != NULL)myapp->Draw(pSpr, m_wTex->GetTexture(),
-			weaponpos, weaponrc, m_weapon_w, m_weapon_h, m_scaling, false, false);
+			weaponpos, weaponrc, m_weapon_w, m_weapon_h, m_scaling, false, false, 1);
 	}
 	// 攻撃中でないとき
 	else {
@@ -281,8 +282,13 @@ void Player::Show() {
 				DamageFlg(false);
 			}
 		}
-		myapp->Draw(pSpr, m_pTex->GetTexture(), pos, rc, m_w, m_h, m_scaling, false, damageflg);
+		myapp->Draw(pSpr, m_pTex->GetTexture(), pos, rc, m_w, m_h, m_scaling, false, damageflg, 1);
 	}
+}
+
+// 現在のプレイヤーのXY座標値を設定.
+void Player::SetXY(D3DXVECTOR2 pos) {
+	m_pos = pos;
 }
 
 // 現在のプレイヤーのXY座標値を得る.
@@ -295,6 +301,25 @@ D3DXVECTOR2 Player::GetXY()
 float Player::GetSize()
 {
 	return m_w;
+}
+
+// プレイヤーが地面に着いた時の処理
+void Player::IsGround() {
+	m_isGround = true;
+	m_shortjump = false;
+	m_vel.y = 0;
+}
+
+// プレイヤーが空中に移動した時の処理
+void Player::IsAir() {
+	m_isGround = false;
+	m_jumpbutton = true;
+}
+
+// プレイヤーが降下中か？
+bool Player::IsFall() {
+	if (m_vel.y > 0) return true;
+	return false;
 }
 
 // 現在の武器のXY座標値を得る.

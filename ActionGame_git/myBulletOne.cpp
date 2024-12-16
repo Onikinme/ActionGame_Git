@@ -14,6 +14,7 @@ BulletOne::BulletOne()
 	, m_velX(0.0f)
 	, m_velY(0.0f)
 	, m_timer(-1.0f)
+	, m_player(false)
 {}
 
 // BulletOneクラスのデストラクタ.
@@ -32,6 +33,8 @@ void BulletOne::Init(float x, float y, float vx, float vy)
 	m_velX = vx;
 	m_velY = vy;
 	m_timer = 0.0f;	// timer >= 0.0f で有効な弾丸となる.
+	//m_player = player;
+
 }
 
 // 現在位置を取得する。引数が参照型になっているため、引数戻り値となる.

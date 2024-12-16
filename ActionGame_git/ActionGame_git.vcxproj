@@ -151,6 +151,8 @@
     <ClCompile Include="myExplosionBuffer.cpp" />
     <ClCompile Include="myExplosionOne.cpp" />
     <ClCompile Include="myFile.cpp" />
+    <ClCompile Include="myFloorManager.cpp" />
+    <ClCompile Include="myFloorSlip.cpp" />
     <ClCompile Include="myInput.cpp" />
     <ClCompile Include="myPlayer.cpp" />
     <ClCompile Include="mySound.cpp" />
@@ -170,6 +172,8 @@
     <ClInclude Include="myExplosionBuffer.h" />
     <ClInclude Include="myExplosionOne.h" />
     <ClInclude Include="myFile.h" />
+    <ClInclude Include="myFloorManager.h" />
+    <ClInclude Include="myFloorSlip.h" />
     <ClInclude Include="myInput.h" />
     <ClInclude Include="myPlayer.h" />
     <ClInclude Include="mySound.h" />

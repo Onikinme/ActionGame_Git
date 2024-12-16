@@ -167,7 +167,7 @@ void BulletBuffer::Draw(MyTexture* pTex)
 			// Œ»ÝˆÊ’u‚ðpos\‘¢‘ÌŒ^‚Ìƒf[ƒ^‚ÉŠi”[‚µ‚Ä•\Ž¦.
 			m_pBuffer[i].GetXY(pos.x, pos.y);
 			//pSpr->Draw(pTex->GetTexture(), NULL, &cnt, &pos, 0xFFFFFFFF);
-			GetApp()->Draw(GetApp()->GetSprite(), pTex->GetTexture(), pos, rc, 0.0f, 0.0f, false, false, false);
+			GetApp()->Draw(GetApp()->GetSprite(), pTex->GetTexture(), pos, rc, 0.0f, 0.0f, false, false, false, 1);
 		}
 	}
 }

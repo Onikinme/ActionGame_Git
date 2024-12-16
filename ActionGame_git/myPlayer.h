@@ -98,11 +98,23 @@ public:
 	// キャラクタを表示する.
 	void Show();
 
+	// 現在のプレイヤーのXY座標値を設定.
+	void SetXY(D3DXVECTOR2 pos);
+
 	// 現在のプレイヤーのXY座標値を得る.
 	D3DXVECTOR2 GetXY();
 
 	// 現在のプレイヤーのサイズを得る.
 	float GetSize();
+
+	// プレイヤーが地面に着いた時の処理
+	void IsGround();
+
+	// プレイヤーが空中に移動した時の処理
+	void IsAir();
+
+	// プレイヤーが降下中か？
+	bool IsFall();
 
 	// 現在の武器のXY座標値を得る.
 	D3DXVECTOR2 GetWeaponXY();

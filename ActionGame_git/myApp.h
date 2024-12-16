@@ -13,6 +13,7 @@
 #include "myEnemyManager.h"
 #include "myBulletBuffer.h"
 #include "myExplosionBuffer.h"
+#include "myFloorManager.h"
 
 #define STAGE_COUNT 3
 
@@ -49,7 +50,10 @@ public:
 
 	IDirect3DDevice9* GetDevice() { return pDevice; }		// スプライトの取得.
 	ID3DXSprite* GetSprite() { return pSprite; }		// スプライトの取得.
+	Player* GetPlayer() { return pPlayer; }// プレイヤー管理クラスのポインタ取得.
+	FloorManager* GetFloorMgr() { return pFloorMgr; }	// 床管理クラスのポインタ取得.
 	EnemyManager* GetEnemyMgr() { return pEnemyMgr; }	// 敵管理クラスのポインタ取得.
+	BossManager* GetBossMgr() { return pBossMgr; }	// ボス管理クラスのポインタ取得.
 	BulletBuffer* GetEneBltBuf() { return pBossBullet; }// 敵弾丸バッファの取得.
 	ExplosionBuffer* GetExplMgr() { return pExplMgr; }	// 爆発のポインタ取得.
 	MyTexture* GetEffectTex() { return pEffectTex; }	// エフェクトのテクスチャ.
@@ -72,15 +76,21 @@ public:
 
 	// 描画関数
 	void Draw(ID3DXSprite* pSprite, IDirect3DTexture9* pTexture,
-		D3DXVECTOR3 pos, RECT rc, float textureWidth, float textureHeight, bool flipHorizontal, bool flipVertical, bool damageflg);
+		D3DXVECTOR3 pos, RECT rc, float textureWidth, float textureHeight, bool flipHorizontal, bool flipVertical, bool damageflg, int size);
 	// 当たり判定（円）
 	bool Collision(D3DXVECTOR2 a, float a_r, D3DXVECTOR2 b, float b_r);
+
+	// すりぬけ床を生成.
+	void CreateFloorSlip(D3DXVECTOR2 pos, D3DXVECTOR2 v_pos, float w, float h);
 
 	// 敵Ａを生成.
 	void CreateEnemyA(D3DXVECTOR2 pos, D3DXVECTOR2 v_pos, float w, float h, int maxhp);
 
 	// ボスＡを生成.
 	void CreateBossA(float x, float y, float vx, float vy, int maxhp);
+
+	// ボスＢを生成.
+	void CreateBossB(float x, float y, float vx, float vy, int maxhp);
 
 private:
 	HRESULT	InitDirect3D();			// Direct3Dの初期化
@@ -104,10 +114,14 @@ private:
 	MyTexture* pMatoTex;			// 当たり判定チェック用の的.
 	//MyTexture* pBulletTex;		// 自機弾丸.
 
+	FloorManager* pFloorMgr;		// 床の配列.
+	MyTexture* pFloorSlipTex;			// すりぬけ床.
+
 	BulletBuffer* pBossBullet;		// ボスの弾丸.
 	MyTexture* pEnemyBltTex;		// 敵弾丸テクスチャ.
 	BossManager* pBossMgr;
-	MyTexture* tmpBossTex;			//ボスtmp
+	MyTexture* pBossTexA;			// ボスAのテクスチャ
+	MyTexture* pBossTexB;			// ボスBのテクスチャ
 
 	MyTexture* PlayerHPBar_Tex;		// プレイヤーのHPバー
 	MyTexture* PlayerHPBarFrame_Tex;		// プレイヤーのHPバーのフレーム

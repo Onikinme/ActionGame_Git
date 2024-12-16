@@ -8,22 +8,6 @@ bool BossTmp::Update(float time)
 	if (m_timer >= 0.0f) {
 		m_timer += time;		// 時刻を進める.
 	}
-	//Animationのスイッチ
-	switch (m_actionNum)
-	{
-	case 0:
-		Move();
-		break;
-	case 1:
-		Attack();
-		break;
-	case 2:
-		Jump();
-		break;
-	default:
-
-		break;
-	}
 	return true;
 }
 
@@ -43,7 +27,21 @@ void BossTmp::Init(float posX, float posY, float vx, float vy, int hp)
 //ボス描画
 void BossTmp::Draw()
 {
-	
+	switch (m_actionNum)
+	{
+	case 0:
+		Move();
+		break;
+	case 1:
+		Attack();
+		break;
+	case 2:
+		Jump();
+		break;
+	default:
+
+		break;
+	}
 
 	D3DXVECTOR3 cnt(32.0f, 32.0f, 0.0f);	// 表示時の中心位置.
 	D3DXVECTOR3 pos(m_posX, m_posY, 0.0f);	// 表示位置.
@@ -67,25 +65,7 @@ void BossTmp::Draw()
 		//画像反転
 	}
 
-
-	// ダメージを受けた時の点滅
-	if (m_boss_damageflg && m_damageTimer > 0.0f) {
-		if (m_timer - m_damageTimer < 0.5f) m_boss_damageflg = true;
-		else if (m_timer - m_damageTimer < 1.0f) {}
-		else if (m_timer - m_damageTimer < 1.5f) m_boss_damageflg = true;
-		else if (m_timer - m_damageTimer < 2.0f) {}
-		else if (m_timer - m_damageTimer < 2.5f) m_boss_damageflg = true;
-		else if (m_timer - m_damageTimer < 3.0f) {}
-		else if (m_timer - m_damageTimer < 3.5f) m_boss_damageflg = true;
-		else if (m_timer - m_damageTimer < 4.0f) {}
-		else if (m_timer - m_damageTimer < 4.5f) m_boss_damageflg = true;
-		else {
-			m_damageTimer = -1.0f;
-			DamageFlg(false);
-		}
-	}
-
-	GetApp()->Draw(GetApp()->GetSprite(), m_pTex->GetTexture(), pos, rc, size, size, !m_leftFlg, false, m_boss_damageflg);
+	GetApp()->Draw(GetApp()->GetSprite(), m_pTex->GetTexture(), pos, rc, size, size, !m_leftFlg, false, false, 2);
 }
 
 /********************
@@ -262,6 +242,8 @@ void BossTmp::Move()
 // 現在のXY座標値を得る.
 D3DXVECTOR2 BossTmp::GetXY()
 {
+	// 練習２
+	// TODO メンバ変数の値を取得する処理を記述してください.
 	return D3DXVECTOR2(m_posX, m_posY);
 }
 
@@ -278,7 +260,6 @@ int BossTmp::GetHP() {
 // ダメージを受けた時の処理
 void BossTmp::Damage(int damage)
 {
-	m_damageTimer = m_timer;
 	m_hp -= damage;
 }
 

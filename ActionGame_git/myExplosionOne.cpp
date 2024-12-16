@@ -50,5 +50,5 @@ void ExplosionOne::Draw(MyTexture* pTex)
 
 	MyApp* myapp = GetApp();
 	ID3DXSprite* pSpr = GetApp()->GetSprite();
-	myapp->Draw(pSpr, pTex->GetTexture(), pos, rcExplImageUV[anim], 64.0f, 64.0f, false, false, false);
+	myapp->Draw(pSpr, pTex->GetTexture(), pos, rcExplImageUV[anim], 64.0f, 64.0f, false, false, false, 1);
 }

@@ -14,6 +14,7 @@ private:
 	float m_posX, m_posY;	// 現在位置.
 	float m_velX, m_velY;	// 弾丸速度.
 	float m_timer;			// 弾丸射出からの時刻.
+	bool m_player;          // プレイヤーの弾か？
 
 public:
 	BulletOne();			// コンストラクタ.
@@ -25,6 +26,7 @@ public:
 	{
 		return m_timer;
 	}
+	//bool IsPlayer(){
 	void Deactive()			// 無効にする.
 	{
 		m_timer = -1.0f;
