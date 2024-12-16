@@ -29,7 +29,7 @@
 #define HEIGHT (540) // 高さ.
 
 // ゲーム全体のサイズ
-#define SIZE (1)
+#define SIZE (2)
 
 // 距離の二乗を求める。「距離」を求めないのは、平方根の処理を避けるため.
 inline float GetDistance2(float x1, float y1, float x2, float y2)

@@ -9,6 +9,7 @@ protected:
 	MyTexture* m_pTex;
 	float m_posX, m_posY;	// 現在位置.
 	float m_velX, m_velY;	// XY方向への速度成分.
+	float m_w;         // ボスのサイズ
 	float m_timer;			// 生成してからの時刻.
 	int   m_animNum;        //ボスのアニメーションの添え字
 
@@ -31,6 +32,7 @@ protected:
 		, m_posY(0.0f)
 		, m_velX(0.0f)
 		, m_velY(0.0f)
+		, m_w(0.0f)
 		, m_timer(0.0f)
 		, m_animNum(0)
 		, m_hp(0)
@@ -57,7 +59,7 @@ public:
 	//ボスの動作
 	virtual bool Update(float time);
 	//ボスの位置初期化
-	virtual void Init(float posX, float posY, float vx, float vy, int hp);
+	virtual void Init(float posX, float posY, float vx, float vy, float w, int hp);
 	//ボス描画
 	virtual void Draw();
 
@@ -95,6 +97,9 @@ public:
 	********************/
 	// 現在のXY座標値を得る.
 	virtual D3DXVECTOR2 GetXY();
+
+	// 現在のボスのサイズを得る.
+	virtual float GetSize();
 
 	// 最大HPを得る
 	virtual int GetMaxHP();
@@ -144,6 +149,9 @@ public:
 
 	// 現在のXY座標値を得る.
 	D3DXVECTOR2 GetXY(int* index);
+
+	// 現在のボスのサイズを得る.
+	float GetSize(int* index);
 
 	// 最大HPを得る
 	int GetMaxHP(int* index);

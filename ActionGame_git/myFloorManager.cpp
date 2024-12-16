@@ -37,7 +37,7 @@ void FloorBase::Show()
 	D3DXVECTOR3 pos(m_pos.x, m_pos.y, 0);
 	MyApp* myapp = GetApp();
 	ID3DXSprite* pSpr = GetApp()->GetSprite();
-	myapp->Draw(pSpr, m_pTex->GetTexture(), pos, { 0, 0,(long)m_w, (long)m_h }, m_w, m_h, false, false, false, 1);
+	myapp->Draw(pSpr, m_pTex->GetTexture(), pos, { 0, 0,(long)m_w, (long)m_h }, m_w, m_h, false, false, false, 0.5f);
 }
 
 // Œ»İ‚ÌXYÀ•W’l‚ğ“¾‚é.

@@ -70,6 +70,7 @@ void BossBBB::Attack()
 			//アクション終了
 			m_actionTimer = -1.0f;
 			m_actionFlg = false;
+			m_dashflg = false;
 			m_animNum = 0;
 			m_actionNum = 0;
 

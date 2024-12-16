@@ -12,10 +12,11 @@ bool BossTmp::Update(float time)
 }
 
 //ボスの位置初期化
-void BossTmp::Init(float posX, float posY, float vx, float vy, int hp)
+void BossTmp::Init(float posX, float posY, float vx, float vy, float w, int hp)
 {
 	m_posX = posX; m_posY = posY;
 	m_velX = vx; m_velY = vy;
+	m_w = w * 1.5f;
 	m_hp = hp;
 	m_timer = 0.0f;
 
@@ -65,7 +66,7 @@ void BossTmp::Draw()
 		//画像反転
 	}
 
-	GetApp()->Draw(GetApp()->GetSprite(), m_pTex->GetTexture(), pos, rc, size, size, !m_leftFlg, false, false, 2);
+	GetApp()->Draw(GetApp()->GetSprite(), m_pTex->GetTexture(), pos, rc, size, size, !m_leftFlg, false, false, 1.5f);
 }
 
 /********************
@@ -247,6 +248,11 @@ D3DXVECTOR2 BossTmp::GetXY()
 	return D3DXVECTOR2(m_posX, m_posY);
 }
 
+// 現在のボスのサイズを得る.
+float BossTmp::GetSize() {
+	return m_w;
+}
+
 // 最大HPを得る
 int BossTmp::GetMaxHP() {
 	return m_maxhp;
@@ -401,6 +407,11 @@ void BossManager::Show()
 // 現在のXY座標値を得る.
 D3DXVECTOR2 BossManager::GetXY(int* index) {
 	return m_ppBuffer[*index]->GetXY();
+}
+
+// 現在のボスのサイズを得る.
+float BossManager::GetSize(int* index) {
+	return m_ppBuffer[*index]->GetSize();
 }
 
 // 最大HPを得る

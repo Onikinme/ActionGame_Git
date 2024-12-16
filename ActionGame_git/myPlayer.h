@@ -48,7 +48,7 @@ private:
 	int m_weaponanim;			  // 武器アニメーション
 	bool m_weaponflg;			  // 武器を表示するフラグ
 
-	int Meter;                    // 必殺技のメーターnnnnnnnnn
+	int Meter;                    // 必殺技のメーター 5溜まれば必殺技が打てる
 
 public:
 // コンストラクタ
@@ -80,6 +80,8 @@ public:
 		, m_attackanim(0)
 		, m_weaponanim(0)
 		, m_weaponflg(false)
+
+		, Meter(0)
 	{
 	}
 

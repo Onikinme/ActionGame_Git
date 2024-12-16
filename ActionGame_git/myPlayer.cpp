@@ -147,7 +147,7 @@ bool Player::Update(float time)
 		// プレイヤーが地面に着いていたらSPACEキーでジャンプ可能
 		if (m_isGround) {
 			if (pInput->IsPushKey(DIK_SPACE) && !m_jumpbutton) {
-				m_vel.y = -10.0f;  // 初速度の設定
+				m_vel.y = -12.0f;  // 初速度の設定
 				//Y座標の更新
 				m_pos.y += m_vel.y;
 				m_jumpbutton = true;

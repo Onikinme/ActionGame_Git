@@ -76,7 +76,7 @@ public:
 
 	// 描画関数
 	void Draw(ID3DXSprite* pSprite, IDirect3DTexture9* pTexture,
-		D3DXVECTOR3 pos, RECT rc, float textureWidth, float textureHeight, bool flipHorizontal, bool flipVertical, bool damageflg, int size);
+		D3DXVECTOR3 pos, RECT rc, float textureWidth, float textureHeight, bool flipHorizontal, bool flipVertical, bool damageflg, float size);
 	// 当たり判定（円）
 	bool Collision(D3DXVECTOR2 a, float a_r, D3DXVECTOR2 b, float b_r);
 
@@ -87,10 +87,10 @@ public:
 	void CreateEnemyA(D3DXVECTOR2 pos, D3DXVECTOR2 v_pos, float w, float h, int maxhp);
 
 	// ボスＡを生成.
-	void CreateBossA(float x, float y, float vx, float vy, int maxhp);
+	void CreateBossA(float x, float y, float vx, float vy, float w, int maxhp);
 
 	// ボスＢを生成.
-	void CreateBossB(float x, float y, float vx, float vy, int maxhp);
+	void CreateBossB(float x, float y, float vx, float vy, float w, int maxhp);
 
 private:
 	HRESULT	InitDirect3D();			// Direct3Dの初期化

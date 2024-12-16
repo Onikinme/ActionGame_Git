@@ -24,8 +24,8 @@ void FloorSlip::Collision() {
 	playersize = GetApp()->GetPlayer()->GetSize();
 
 	// プレイヤーが上からすりぬけ床に降ってきた時
-	if (m_pos.x < playerpos.x + playersize && playerpos.x < m_pos.x + m_w && m_pos.y - m_h < playerpos.y && m_pos.y - m_h + 8 > playerpos.y && GetApp()->GetPlayer()->IsFall()) {
-		GetApp()->GetPlayer()->SetXY(D3DXVECTOR2(playerpos.x, m_pos.y - m_h));
+	if (m_pos.x < playerpos.x + playersize * SIZE && playerpos.x < m_pos.x + m_w && m_pos.y - m_h * SIZE < playerpos.y && m_pos.y - m_h * SIZE + 8 * SIZE > playerpos.y && GetApp()->GetPlayer()->IsFall()) {
+		GetApp()->GetPlayer()->SetXY(D3DXVECTOR2(playerpos.x, m_pos.y - m_h * SIZE));
 		// プレイヤーが接地したことにする
 		GetApp()->GetPlayer()->IsGround();
 		// プレイヤーがこの床に乗ったというフラグをtrueにする
@@ -33,12 +33,12 @@ void FloorSlip::Collision() {
 	}
 
 	// この床からジャンプしたらfloorflgをfalseにする
-	if (floorflg && m_pos.y - m_h > playerpos.y) {
+	if (floorflg && m_pos.y - m_h * SIZE > playerpos.y) {
 		floorflg = false;
 	}
 
 	// プレイヤーがこの床の横側から降りたとき
-	if (floorflg && (m_pos.x > playerpos.x + playersize || playerpos.x > m_pos.x + m_w)) {
+	if (floorflg && (m_pos.x > playerpos.x + playersize * SIZE|| playerpos.x > m_pos.x + m_w)) {
 		// プレイヤーが空中にいることにする
 		GetApp()->GetPlayer()->IsAir();
 		floorflg = false;
