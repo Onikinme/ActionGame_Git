@@ -15,8 +15,7 @@ protected:
 
 	// 前川祐毅　追加
 	int   m_maxhp;          //  最大耐久値
-	//bool  m_boss_damageflg;	// ボスがダメージを受けたか（同じ攻撃で複数回ダメージを受けないようにする）
-	unsigned char m_damageflg; // ボスがダメージを受けたか（ビット演算で管理する）
+	bool  m_boss_damageflg;	// ボスがダメージを受けたか（同じ攻撃で複数回ダメージを受けないようにする）
 
 	int   m_hp;             //  耐久値
 	float m_actionTimer;    //攻撃中の時間	
@@ -44,8 +43,7 @@ protected:
 
 		// 前川祐毅　追加
 		, m_maxhp(0)
-		//, m_boss_damageflg(false)
-		, m_damageflg(0x00)
+		, m_boss_damageflg(false)
 	{
 	}
 
@@ -63,11 +61,7 @@ public:
 	//ボスの位置初期化
 	virtual void Init(float posX, float posY, float vx, float vy, float w, int hp);
 	//ボス描画
-	virtual virtual void Draw();
-	virtual void Deactive()			// 無効にする.
-	{
-		m_timer = -1.0f;
-	}
+	virtual void Draw();
 
 	/********************
 	*
@@ -117,16 +111,10 @@ public:
 	virtual void Damage(int damage);
 
 	// ダメージフラグを管理
-	virtual void DamageFlg(unsigned char damage);
-
-	// ダメージフラグをリセット
-	virtual void DamageReset(unsigned char damage);
+	virtual void DamageFlg(bool damage);
 
 	// 攻撃でダメージを負ったか？
-	virtual unsigned char IsDamage();
-
-	// デバッグ用に文字を返す.
-	virtual char Getch() { return '*'; }
+	virtual bool IsDamage();
 };
 
 //////////////////////////////////
@@ -175,13 +163,10 @@ public:
 	void Damage(int damage, int index);
 
 	// ダメージフラグを管理
-	void DamageFlg(unsigned char damage, int* index);
-
-	// ダメージフラグをリセット
-	void DamageReset(unsigned char damage, int* index);
+	void DamageFlg(bool damage, int index);
 
 	// 攻撃でダメージを負ったか？
-	unsigned char IsDamage(int* index);
+	bool IsDamage(int index);
 
 	// 配列の大きさを返す
 	int BossMax();
@@ -194,6 +179,4 @@ public:
 
 	//アクション決定
 	void ChangeAction(int a, int index);
-
-	char* GetText();
 };

@@ -40,16 +40,12 @@ public:
 		return (m_pBuffer + index);// &m_pBuffer[index] と同じ.
 	}
 
-	void GetXY(int* index, float& x, float& y);	// 現在のXY座標値を得る.
-	void GetSize(int* index, float& size);      // 弾丸のサイズを得る
 	void Update(float time);	// 配列の内容である弾丸全体を更新する.
  	void Draw(MyTexture*);		// 弾丸テクスチャを指定して描画.
 	char* GetText();
 	void Collision();			// プレーヤーの弾丸と敵キャラとの衝突判定.
 	bool CollisionPlayer(float x, float y, float limit2);
 								// 敵の弾丸とプレイヤー機との当たり判定.
-	int BulletMax(); // 配列の大きさを返す
-	bool PPBuffer(int index); // 配列が一つでも使用されているか
 #if defined (Shiken3)
 	void Explosion(MyTexture* pTex, int index); // テクスチャ指定付きで、爆発を描画する.
 #endif

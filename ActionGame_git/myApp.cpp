@@ -14,8 +14,6 @@
 #include "myBossAAA.h"
 #include "myBossBBB.h"
 
-// 画面遷移を作る
-
 //#define FULLSCREEN
 
 // ウィンドウタイトルバーに表示されるバージョン名.
@@ -44,21 +42,13 @@ MyApp::MyApp()
 	, pFloorMgr(NULL)			// 床の配列.
 	, pFloorSlipTex(NULL)				// すりぬけ床.
 	, pEffectTex(NULL)			// 攻撃エフェクト
-	, pPlayerBullet(NULL)			// プレイヤーの弾丸.
-	, pPlayerBltTex(NULL)		// プレイヤー弾丸テクスチャ.
+	//, pBulletTex(NULL)			// 自機弾丸.
 	, pBossBullet(NULL)			// ボスの弾丸.
-	, pEnemyBltTex(NULL)		// 敵弾丸テクスチャ.
 	, pBossMgr(NULL)
 	, pBossTexA(NULL)			// ボスAのテクスチャ
 	, pBossTexB(NULL)			// ボスBのテクスチャ
-	, PlayerMeter_Tex(NULL)
-	, PlayerMeterFrame_Tex(NULL)
-	, PlayerMeterHatsu_Tex(NULL)
-	, PlayerMeterMetsu_Tex(NULL)
 	, PlayerHPBar_Tex(NULL)
-	, PlayerHPBarFrame_Tex(NULL)
 	, BossHPBar_Tex(NULL)
-	, BossHPBarFrame_Tex(NULL)
 	, nextFireFrame(0)			// 自機が次に弾を撃てるまでの時間（フレーム）.
 	, buttons(0)				// ボタンの情報.
 	, pPlayer(NULL)
@@ -70,6 +60,7 @@ MyApp::MyApp()
 	, BackGroundY(0)            // 背景の現在位置.
 	, score(0)					// スコア.
 	, playerPower(0)			// 自機の耐久力.
+	, pEnemyBltTex(NULL)		// 敵弾丸テクスチャ.
 	, pExplMgr(NULL)		    // 爆発の配列.
 	, pExplosionTex(NULL)
 	, joyID(-1)					// ゲームコントローラのID.
@@ -152,12 +143,6 @@ bool MyApp::InitApp()
 		return false;
 	}
 
-	// 弾丸管理クラス（プレイヤー用）のオブジェクトを生成&初期化.
-	pPlayerBullet = new BulletBuffer(1);
-	if (pPlayerBullet == NULL || !pPlayerBullet->Init()) {
-		return false;
-	}
-
 	// 弾丸管理クラス（敵用）のオブジェクトを生成&初期化.
 	pBossBullet = new BulletBuffer(100);
 	if (pBossBullet == NULL || !pBossBullet->Init()) {
@@ -177,17 +162,12 @@ bool MyApp::InitApp()
 
 		pPlayerTex = MyTexture::LoadTexture(pDevice, _T("data/image/player_kari.png"));
 		pPlayer_WeaponTex = MyTexture::LoadTexture(pDevice, _T("data/image/player_weapon.png"));
-		pPlayerBltTex = MyTexture::LoadTexture(pDevice, _T("data/image/playerbullet.png"));
-		pEnemyBltTex = MyTexture::LoadTexture(pDevice, _T("data/image/enemybullet.png"));
+		pEnemyBltTex = MyTexture::LoadTexture(pDevice, _T("data/image/bullet.png"));
 		pBossTexA = MyTexture::LoadTexture(pDevice, _T("data/image/bossTexture_0.png"));
 		pBossTexB = MyTexture::LoadTexture(pDevice, _T("data/image/bossTexture_1.png"));
 		pMatoTex = MyTexture::LoadTexture(pDevice, _T("data/image/mato.png"));
 		pExplosionTex = MyTexture::LoadTexture(pDevice, _T("data/image/effect.png"));
 
-		PlayerMeter_Tex = MyTexture::LoadTexture(pDevice, _T("data/image/playerMeter.png"));
-		PlayerMeterFrame_Tex = MyTexture::LoadTexture(pDevice, _T("data/image/playerMeterframe.png"));
-		PlayerMeterHatsu_Tex = MyTexture::LoadTexture(pDevice, _T("data/image/PlayerMeterHatsudou.png"));
-		PlayerMeterMetsu_Tex = MyTexture::LoadTexture(pDevice, _T("data/image/PlayerMeterTenmetsu.png"));
 		PlayerHPBar_Tex = MyTexture::LoadTexture(pDevice, _T("data/image/playerHPbar.png"));
 		PlayerHPBarFrame_Tex = MyTexture::LoadTexture(pDevice, _T("data/image/playerHPbarframe.png"));
 		BossHPBar_Tex = MyTexture::LoadTexture(pDevice, _T("data/image/bossHPbar.png"));
@@ -271,7 +251,6 @@ void MyApp::ReleaseData()
 	if (pFloorMgr) { delete pFloorMgr; }
 	if (pEnemyMgr) { delete pEnemyMgr; }
 	if (pBossMgr) { delete pBossMgr; }
-	if (pPlayerBullet) { delete pPlayerBullet; }
 	if (pBossBullet) { delete pBossBullet; }
 	if (pFont) { delete pFont; }
 
@@ -290,7 +269,6 @@ void MyApp::ResetGameData()
 	pEnemyMgr->ResetAll();
 	pBossMgr->ResetAll();
 	pExplMgr->ResetAll();
-	pPlayerBullet->ResetAll();
 	pBossBullet->ResetAll();
 
 	// プレイヤークラスのオブジェクトを生成
@@ -311,7 +289,7 @@ void MyApp::ResetGameData()
 	//CreateBossA(800.0f, HEIGHT - 128.0f * SIZE, 0.0f, 0.0f, 64.0f, 5);
 
 	//ボスBの初期化
-	CreateBossB(800.0f, HEIGHT - 128.0f * SIZE, 0.0f, 0.0f, 64.0f, 26);
+	CreateBossB(800.0f, HEIGHT - 128.0f * SIZE, 0.0f, 0.0f, 64.0f, 5);
 
 	playerPower = 10;
 	nextFireFrame = 0;
@@ -412,7 +390,7 @@ BOOL MyApp::UpdateData()
 		GameState eNextState = GAME_STATE_TITLE;
 
 		// 状態を遷移.
-		gameState = eNextState;
+		gameState = GAME_STATE_PLAYING;
 		break;
 	}
 
@@ -428,7 +406,7 @@ BOOL MyApp::UpdateData()
 		// Aボタン(SPACE-Key)だけが押されたらゲーム開始.
 		if (buttons == JOY_BTN_BIT_A)
 		{
-			gameState = GAME_STATE_TUTORIAL;
+			gameState = GAME_STATE_READY;
 			stateTimer = 0;
 			gameTimer = 0;
 		}
@@ -455,21 +433,6 @@ BOOL MyApp::UpdateData()
 		break;
 	}
 
-	case GAME_STATE_TUTORIAL:
-	{
-		if (pInput->IsPushKey(DIK_W)) {
-			buttons |= JOY_BTN_BIT_A;// 
-		}
-
-		// W-Keyが押されたらゲーム画面へ.
-		if (buttons == JOY_BTN_BIT_A)
-		{
-			gameState = GAME_STATE_PLAYING;
-		}
-
-		break;
-	}
-
 	case GAME_STATE_PLAYING:
 	{
 		UpdatePlaying(true);
@@ -482,19 +445,6 @@ BOOL MyApp::UpdateData()
 			gameState = GAME_STATE_DEAD;
 			stateTimer = 0;
 		}
-		
-		/* デバッグ用
-		if (pInput->IsPushKey(DIK_Q)) {
-			buttons |= JOY_BTN_BIT_A;// 
-		}
-
-		//	Q-Keyが押されたらクリア画面へ.
-		if (buttons == JOY_BTN_BIT_A)
-		{
-			gameState = GAME_STATE_CLEAR;
-		}
-		*/
-
 		break;
 	}
 
@@ -520,7 +470,7 @@ BOOL MyApp::UpdateData()
 		// BACKSPACE-Keyだけが押されたらタイトルに戻る.
 		if (buttons == JOY_BTN_BIT_A)
 		{
-			gameState = GAME_STATE_LOAD;
+			gameState = GAME_STATE_TITLE;
 			stateTimer = 0;
 			gameTimer = 0;
 			playerPower = 10;
@@ -568,23 +518,9 @@ void MyApp::UpdatePlaying(bool playable)
 				if (pEnemyMgr->PPBuffer(i))pEnemyMgr->DamageFlg(false, i);
 			}
 			for (int i = 0; i < pBossMgr->BossMax(); i++) {
-				if (pBossMgr->PPBuffer(i))pBossMgr->DamageReset(0x2 , &i);
+				if (pBossMgr->PPBuffer(i))pBossMgr->DamageFlg(false, i);
 			}
 		}
-
-		if (!pPlayerBullet->Next() == NULL) {
-			for (int i = 0; i < pBossMgr->BossMax(); i++) {
-				if (pBossMgr->PPBuffer(i))pBossMgr->DamageReset(0x1, &i);
-			}
-		}
-
-		bool bossflg = false; // ボスを倒したかどうか
-		for (int i = 0; i < pBossMgr->BossMax(); i++) {
-			if (pBossMgr->PPBuffer(i)) {
-				bossflg = true;
-			}
-		}
-		if (!bossflg) gameState = GAME_STATE_CLEAR;
 
 		// すりぬけ床を更新、ただしすり抜け対策のため時分割する.
 		pFloorMgr->Update(1.0f / 10);
@@ -595,7 +531,6 @@ void MyApp::UpdatePlaying(bool playable)
 		// 弾丸とボスを更新、ただしすり抜け対策のため時分割する.
 		for (int i = 0; i < 10; i++)
 		{
-			pPlayerBullet->Update(1.0f / 10);
 			pBossBullet->Update(1.0f / 10);
 		}
 		pBossMgr->Update(1.0f / 10);
@@ -629,7 +564,6 @@ void MyApp::UpdatePlaying(bool playable)
 
 					pExplMgr->Explose(lengthX, lengthY);
 					pEnemyMgr->Damage(1, i);
-					GetPlayer()->PlusMeter(1);
 				}
 			}
 		}
@@ -653,11 +587,11 @@ void MyApp::UpdatePlaying(bool playable)
 			}
 		}
 
-		// ボスとプレイヤーの武器の当たり判定（武器を出している最中ならば）
+		// ボスと武器の当たり判定（武器を出している最中ならば）
 		for (int i = 0; i < pBossMgr->BossMax(); i++) {
 			if (pBossMgr->PPBuffer(i)) {
-				if (pPlayer->IsWeapon() && Collision(pPlayer->GetWeaponXY(), pPlayer->GetWeaponW() / 2, pBossMgr->GetXY(&i), pBossMgr->GetSize(&i) / 2) && (pBossMgr->IsDamage(&i) & 0x1) == 0) { // 武器の座標、武器の半径、ボスの座標、ボスの半径
-					pBossMgr->DamageFlg(0x1, &i);
+				if (pPlayer->IsWeapon() && Collision(pPlayer->GetWeaponXY(), pPlayer->GetWeaponW() / 2, pBossMgr->GetXY(&i), pBossMgr->GetSize(&i) / 2) && !pBossMgr->IsDamage(i)) { // 武器の座標、武器の半径、ボスの座標、ボスの半径
+					pBossMgr->DamageFlg(true, i);
 					// 中心点の距離 
 					float lengthX = (pPlayer->GetWeaponXY().x + pBossMgr->GetXY(&i).x) / 2;
 
@@ -665,7 +599,6 @@ void MyApp::UpdatePlaying(bool playable)
 
 					pExplMgr->Explose(lengthX, lengthY);
 					pBossMgr->Damage(1, i);
-					GetPlayer()->PlusMeter(1);
 				}
 			}
 		}
@@ -688,31 +621,6 @@ void MyApp::UpdatePlaying(bool playable)
 				}
 			}
 		}
-
-		D3DXVECTOR2 pos = { 0, 0 };
-		float size = 0;
-		// ボスとプレイヤーの弾丸の当たり判定
-		for (int i = 0; i < pBossMgr->BossMax(); i++) {
-			if (pBossMgr->PPBuffer(i)) {
-				for (int j = 0; j < pPlayerBullet->BulletMax(); j++) {
-					if (pPlayerBullet->PPBuffer(j)) {
-						pPlayerBullet->GetXY(&j, pos.x, pos.y);
-						pPlayerBullet->GetSize(&j, size);
-						if (Collision(pos, size / 2, pBossMgr->GetXY(&i), pBossMgr->GetSize(&i) / 2) && (pBossMgr->IsDamage(&i) & 0x2) == 0) { // 武器の座標、武器の半径、ボスの座標、ボスの半径
-							pBossMgr->DamageFlg(0x2, &i);
-							// 中心点の距離 
-							float lengthX = (pos.x + pBossMgr->GetXY(&i).x) / 2;
-
-							float lengthY = (pos.y + pBossMgr->GetXY(&i).y) / 2;
-
-							pExplMgr->Explose(lengthX, lengthY);
-							pBossMgr->Damage(20, i);
-							GetPlayer()->PlusMeter(0);
-						}
-					}
-				}
-			}
-		}
 	}
 }
 
@@ -724,7 +632,14 @@ HRESULT MyApp::DrawData()
 	D3DXVECTOR3 pos(0, 0, 0);
 
 	D3DCOLOR rgb = D3DCOLOR_XRGB(128, 128, 128);
-	pDevice->Clear(0, NULL, D3DCLEAR_TARGET, rgb, 1.0f, 0); // 画面全体を消去.
+	// 画面全体を消去.
+	pDevice->Clear(0, NULL, D3DCLEAR_TARGET, rgb, 1.0f, 0);
+
+	// 描画を開始（シーン描画の開始）.
+	pDevice->BeginScene();
+
+	// スプライトの描画を開始.
+	pSprite->Begin(D3DXSPRITE_ALPHABLEND);
 
 	// ゲームの状態による描画分け.
 	switch (gameState)
@@ -736,8 +651,6 @@ HRESULT MyApp::DrawData()
 
 	case GAME_STATE_TITLE:
 	{
-		rgb = D3DCOLOR_XRGB(128, 160, 128);
-		pDevice->Clear(0, NULL, D3DCLEAR_TARGET, rgb, 1.0f, 0); // 画面全体を消去.
 		cnt.x = 128; cnt.y = 32;
 		pos.x = WIDTH / 2; pos.y = HEIGHT / 2 - 64;
 		//pSprite->Draw(pTitleTex->GetTexture(), NULL, &cnt, &pos, 0xFFFFFFFF);
@@ -748,12 +661,6 @@ HRESULT MyApp::DrawData()
 		}
 
 		fps.StartTimer();
-
-		sprintf_s(text, "title");
-		pFont->DrawBmpText(text, WIDTH / 2, HEIGHT / 2, 8, 0xFFFFFFFF);
-
-		sprintf_s(text, "press space");
-		pFont->DrawBmpText(text, WIDTH / 2, HEIGHT / 2 + 128, 8, 0xFFFFFFFF);
 	}
 	break;
 
@@ -768,30 +675,10 @@ HRESULT MyApp::DrawData()
 	}
 	break;
 
-	case GAME_STATE_TUTORIAL:
-	{
-		rgb = D3DCOLOR_XRGB(128, 128, 160);
-		pDevice->Clear(0, NULL, D3DCLEAR_TARGET, rgb, 1.0f, 0); // 画面全体を消去.
-		sprintf_s(text, "tutorial...");
-		pFont->DrawBmpText(text, WIDTH / 2, HEIGHT / 2, 8, 0xFFFFFFFF);
-
-		sprintf_s(text, "press W-key");
-		pFont->DrawBmpText(text, WIDTH / 2, HEIGHT / 2 + 128, 8, 0xFFFFFFFF);
-	}
-	break;
-
 	case GAME_STATE_PLAYING:
 	{
 		// 画像の表示.
 		DrawDataPlaying();
-
-		/* デバッグ用
-		sprintf_s(text, "game playing...");
-		pFont->DrawBmpText(text, WIDTH / 2, HEIGHT / 2, 8, 0xFFFFFFFF);
-
-		sprintf_s(text, "press Q-key");
-		pFont->DrawBmpText(text, WIDTH / 2, HEIGHT / 2 + 128, 8, 0xFFFFFFFF);
-		*/
 	}
 	break;
 
@@ -804,24 +691,10 @@ HRESULT MyApp::DrawData()
 
 	case GAME_STATE_CLEAR:
 	{
-		//fps.StartTimer();
-
-		rgb = D3DCOLOR_XRGB(160, 128, 128);
-		pDevice->Clear(0, NULL, D3DCLEAR_TARGET, rgb, 1.0f, 0); // 画面全体を消去.
-		sprintf_s(text, "game clear!!!");
-		pFont->DrawBmpText(text, WIDTH / 2, HEIGHT / 2, 8, 0xFFFFFFFF);
-
-		sprintf_s(text, "press backspace");
-		pFont->DrawBmpText(text, WIDTH / 2, HEIGHT / 2 + 128, 8, 0xFFFFFFFF);
+		fps.StartTimer();
 	}
 	break;
 	}
-
-	// 描画を開始（シーン描画の開始）.
-	pDevice->BeginScene();
-
-	// スプライトの描画を開始.
-	pSprite->Begin(D3DXSPRITE_ALPHABLEND);
 
 	/******************
 	* 
@@ -855,7 +728,7 @@ HRESULT MyApp::DrawData()
 	//pFont->DrawBmpText(txt, 20, 500, 8, 0xFFFFFFFF);
 
 	//int u = 0;
-	//sprintf_s(txt, "enemies:%x", pBossMgr->IsDamage(&u));
+	//sprintf_s(txt, "enemies:%f", pBossMgr->GetSize(&u));
 	//pFont->DrawBmpText(txt, 20, 500, 8, 0xFFFFFFFF);
 	
 
@@ -864,7 +737,7 @@ HRESULT MyApp::DrawData()
 
 	fps.StartTimer();
 
-	//sprintf_s(txt, "explosion:%s", pBossMgr->GetText());
+	//sprintf_s(txt, "explosion:%s", pExplMgr->GetText());
 	//pFont->DrawBmpText(txt, 20, 400, 8, 0xFFFFFFFF);
 
 	//sprintf_s(txt, "player:%s", pPlayer->GetXY().x);
@@ -891,7 +764,6 @@ void MyApp::DrawDataPlaying()
 	pEnemyMgr->Show();
 
 	// 弾丸の表示。配列を順番に探査して表示する.
-	pPlayerBullet->Draw(pPlayerBltTex);
 	pBossBullet->Draw(pEnemyBltTex);
 
 	//ボス描画
@@ -912,7 +784,6 @@ void MyApp::DrawDataPlaying()
 		PlayerMaxHP = pPlayer->GetMaxHP();
 		PlayerHP = pPlayer->GetHP();
 		PlayerHP = PlayerHP / PlayerMaxHP * 100;
-		int Meter = pPlayer->GetMeter();
 		/*
 		Draw(pSprite, PlayerHPBar_Tex->GetTexture(), D3DXVECTOR3(0 + 36, HEIGHT - 36, 0), RECT{ 0, 0, 100, 18 }, 0.0f, 0.0f, false, false);
 		Draw(pSprite, PlayerHPBar_Tex->GetTexture(), D3DXVECTOR3(0 + 36, HEIGHT - 36, 0), RECT{ 0, 18, (int)PlayerHP, 36 }, 0.0f, 0.0f, false, false);
@@ -921,25 +792,14 @@ void MyApp::DrawDataPlaying()
 		Draw(pSprite, PlayerHPBar_Tex->GetTexture(), D3DXVECTOR3(0 + 35 * SIZE, HEIGHT - 21 * SIZE, 0), RECT{ 0, 0, 100, 18 }, 0.0f, 0.0f, false, false, false, 1);
 		Draw(pSprite, PlayerHPBar_Tex->GetTexture(), D3DXVECTOR3(0 + 35 * SIZE, HEIGHT - 21 * SIZE, 0), RECT{ 0, 18, (int)PlayerHP, 36 }, 0.0f, 0.0f, false, false, false, 1);
 
-		// プレイヤーの必殺技ゲージの描画
-		Draw(pSprite, PlayerMeterFrame_Tex->GetTexture(), D3DXVECTOR3(138 * SIZE, HEIGHT - 12 * SIZE, 0), RECT{ 0, 0, 81, 12 }, 0.0f, 0.0f, false, false, false, 1);
-		Draw(pSprite, PlayerMeter_Tex->GetTexture(), D3DXVECTOR3(138 * SIZE, HEIGHT - 12 * SIZE, 0), RECT{ 0, 0, 81, 12 }, 0.0f, 0.0f, false, false, false, 1);
-		Draw(pSprite, PlayerMeter_Tex->GetTexture(), D3DXVECTOR3(138 * SIZE, HEIGHT - 12 * SIZE, 0), RECT{ 0, 12, 16 * Meter, 24 }, 0.0f, 0.0f, false, false, false, 1);
-		if (Meter == 5) {
-			if(gameTimer % 50 >= 25)Draw(pSprite, PlayerMeterMetsu_Tex->GetTexture(), D3DXVECTOR3(138 * SIZE, HEIGHT - 12 * SIZE, 0), RECT{ 0, 0, 81, 12 }, 0.0f, 0.0f, false, false, false, 1);
-			Draw(pSprite, PlayerMeterHatsu_Tex->GetTexture(), D3DXVECTOR3(138 * SIZE, HEIGHT - 12 * SIZE, 0), RECT{ 0, 0, 81, 12 }, 0.0f, 0.0f, false, false, false, 1);
-		}
-
 		// ボスのHPバーを更新
-		//int b = 0; // ポインタを使用したいため、変数を定義
+		int u = 0;
 		float BossMaxHP = 0;
 		float BossHP = 0;
-		for (int i = 0; i < pBossMgr->BossMax(); i++) {
-			if (pBossMgr->PPBuffer(i)) {
-				BossMaxHP = pBossMgr->GetMaxHP(&i);
-				BossHP = pBossMgr->GetHP(&i);
-				BossHP = BossHP / BossMaxHP * 200;
-			}
+		if (pBossMgr->PPBuffer(u)) {
+			BossMaxHP = pBossMgr->GetMaxHP(&u);
+			BossHP = pBossMgr->GetHP(&u);
+			BossHP = BossHP / BossMaxHP * 200;
 		}
 		/*
 		Draw(pSprite, BossHPBarFrame_Tex->GetTexture(), D3DXVECTOR3(WIDTH - 238 - 33, 0 + 15, 0), RECT{ 0, 0, 238, 24 }, 0.0f, 0.0f, false, false);
@@ -1000,8 +860,8 @@ void MyApp::Draw(ID3DXSprite* pSprite, IDirect3DTexture9* pTexture,
 
 	// 描画
 	pSprite->Begin(D3DXSPRITE_ALPHABLEND);
-	if (damageflg)pSprite->Draw(pTexture, &rc, NULL, NULL, D3DCOLOR_ARGB(255, 255, 0, 0));
-	else pSprite->Draw(pTexture, &rc, NULL, NULL, D3DCOLOR_ARGB(255, 255, 255, 255));
+	if (damageflg)pSprite->Draw(pTexture, &rc, NULL, NULL, D3DCOLOR_XRGB(255, 0, 0));
+	else pSprite->Draw(pTexture, &rc, NULL, NULL, D3DCOLOR_XRGB(255, 255, 255));
 	pSprite->End();
 
 	// 変換行列をリセット

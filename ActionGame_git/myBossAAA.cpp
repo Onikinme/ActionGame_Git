@@ -116,7 +116,7 @@ void BossAAA::Fire()
 			float fXSpeed = speed * dx;
 			float fYSpeed = speed * dy;
 
-			pBulletOne->Init(m_posX - ADx, m_posY - ADy, fXSpeed, fYSpeed, 16);
+			pBulletOne->Init(m_posX - ADx, m_posY - ADy, fXSpeed, fYSpeed);
 			m_fireflg = true;
 		}
 		

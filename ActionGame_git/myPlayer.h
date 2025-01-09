@@ -48,7 +48,7 @@ private:
 	int m_weaponanim;			  // 武器アニメーション
 	bool m_weaponflg;			  // 武器を表示するフラグ
 
-	int m_meter;                    // 必殺技のメーター 5溜まれば必殺技が打てる
+	int Meter;                    // 必殺技のメーター 5溜まれば必殺技が打てる
 
 public:
 // コンストラクタ
@@ -81,7 +81,7 @@ public:
 		, m_weaponanim(0)
 		, m_weaponflg(false)
 
-		, m_meter(0)
+		, Meter(0)
 	{
 	}
 
@@ -109,9 +109,6 @@ public:
 	// 現在のプレイヤーのサイズを得る.
 	float GetSize();
 
-	// 現在の必殺技ゲージを得る
-	int GetMeter();
-
 	// プレイヤーが地面に着いた時の処理
 	void IsGround();
 
@@ -120,9 +117,6 @@ public:
 
 	// プレイヤーが降下中か？
 	bool IsFall();
-
-	// プレイヤーの必殺技ゲージに+1
-	void PlusMeter(int plus);
 
 	// 現在の武器のXY座標値を得る.
 	D3DXVECTOR2 GetWeaponXY();

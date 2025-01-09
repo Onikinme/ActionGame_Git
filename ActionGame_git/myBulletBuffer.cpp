@@ -70,17 +70,6 @@ BulletOne* BulletBuffer::Next()
 	return NULL;
 }
 
-// 現在のXY座標値を得る.
-void BulletBuffer::GetXY(int* index, float& x, float& y) {
-	m_pBuffer[*index].GetXY(x, y);
-}
-
-// 弾丸のサイズを得る
-void BulletBuffer::GetSize(int* index, float& size)
-{
-	m_pBuffer[*index].GetSize(size);
-}
-
 // リングバッファ内のデータを順次更新する.
 void BulletBuffer::Update(float time)
 {
@@ -167,11 +156,18 @@ void BulletBuffer::Collision()
 // テクスチャ指定付きで、弾丸を描画する.
 void BulletBuffer::Draw(MyTexture* pTex)
 {
-	for (int i = 0; i < m_bulletMax; ++i)
-	{
-		// 有効なら表示.
+	ID3DXSprite* pSpr = GetApp()->GetSprite();
+	D3DXVECTOR3 cnt(8, 8, 0);
+	D3DXVECTOR3 pos(0, 0, 0);
+	RECT rc = { 0, 0, 16, 16 };
+
+	for (int i = 0; i < m_bulletMax; i++) {
+		// 取得した弾丸が有効なら表示.
 		if (m_pBuffer[i].IsActive()) {
-			m_pBuffer[i].Draw(pTex);
+			// 現在位置をpos構造体型のデータに格納して表示.
+			m_pBuffer[i].GetXY(pos.x, pos.y);
+			//pSpr->Draw(pTex->GetTexture(), NULL, &cnt, &pos, 0xFFFFFFFF);
+			GetApp()->Draw(GetApp()->GetSprite(), pTex->GetTexture(), pos, rc, 0.0f, 0.0f, false, false, false, 1);
 		}
 	}
 }
@@ -197,20 +193,6 @@ bool BulletBuffer::CollisionPlayer(float x, float y, float limit2)
 			return true;
 		}
 	}
-	return false;
-}
-
-// 配列の大きさを返す
-int BulletBuffer::BulletMax()
-{
-	return m_bulletMax;
-}
-
-// 配列が一つでも使用されているか
-bool BulletBuffer::PPBuffer(int index) {
-		if (m_pBuffer[index].IsActive()) {
-			return true;
-		}
 	return false;
 }
 

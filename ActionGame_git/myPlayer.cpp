@@ -38,7 +38,6 @@ void Player::Init(D3DXVECTOR2 pos, D3DXVECTOR2 v_pos, float w, float h, float ww
 	m_vel = v_pos;					  // 横方向へのスピード ,ジャンプ力
 	m_w = w, m_h = h;				  // プレイヤーのサイズ
 	m_weapon_w = ww, m_weapon_h = wh; // 武器のサイズ
-	m_weaponflg = false;
 	MaxHP = maxhp;
 	HP = MaxHP;
 	player_damageflg = false;
@@ -48,7 +47,6 @@ void Player::Init(D3DXVECTOR2 pos, D3DXVECTOR2 v_pos, float w, float h, float ww
 	m_movetimer = 0.0f;				  // タイマーを0.0fにして、有効化する. 
 	m_attacktimer = -1.0f;			  // タイマーを-1.0fにして、無効化する. 
 	m_damagetimer = -1.0f;			  // タイマーを-1.0fにして、無効化する. 
-	m_meter = 0;
 }
 
 // プレイヤーの移動処理：基底クラスでは時刻を進めるだけ.
@@ -213,22 +211,6 @@ bool Player::Update(float time)
 		if (!pInput->IsPushKey(DIK_P) && m_attackflg && m_attacktimer == -1.0f) {
 			m_attackflg = false;
 		}
-
-		// 必殺技ゲージが5溜まっているときにCキーで必殺技（飛び道具）を放つ
-		if (pInput->IsPushKey(DIK_C) && m_meter == 5)
-		{
-			BulletOne* pBulletOne = GetApp()->GetPlaBltBuf()->Next();
-			if (pBulletOne != NULL)
-			{
-				int b = 0;
-				int direct = 6.0f; // 攻撃方向 
-				if (m_scaling) {
-					direct *= -1;
-				}
-				pBulletOne->Init(GetXY().x, GetXY().y - GetSize(), direct, 0, 64);
-			}
-			m_meter = 0;
-		}
 	}
 
 	// 武器の座標は、プレイヤーの進行方向に設置する
@@ -321,11 +303,6 @@ float Player::GetSize()
 	return m_w;
 }
 
-// 現在の必殺技ゲージを得る
-int Player::GetMeter() {
-	return m_meter;
-}
-
 // プレイヤーが地面に着いた時の処理
 void Player::IsGround() {
 	m_isGround = true;
@@ -343,13 +320,6 @@ void Player::IsAir() {
 bool Player::IsFall() {
 	if (m_vel.y > 0) return true;
 	return false;
-}
-
-// プレイヤーの必殺技ゲージを増減
-void Player::PlusMeter(int plus) {
-	m_meter += plus;
-	if (m_meter > 5) m_meter = 5;
-	if (m_meter < 0)m_meter = 0;
 }
 
 // 現在の武器のXY座標値を得る.
