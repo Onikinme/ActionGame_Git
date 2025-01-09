@@ -20,12 +20,13 @@
 // ゲーム全体の状態遷移.
 enum GameState
 {
-	GAME_STATE_TITLE, 	// タイトル画面.
-	GAME_STATE_LOAD, 	// ステージ読み込み.
-	GAME_STATE_READY, 	// ゲーム開始待ち.
-	GAME_STATE_PLAYING, // ゲーム進行中.
-	GAME_STATE_CLEAR, 	// ステージクリア！.
-	GAME_STATE_DEAD, 	// プレイヤーが撃破される.
+	GAME_STATE_TITLE, 	 // タイトル画面.
+	GAME_STATE_LOAD, 	 // ステージ読み込み.
+	GAME_STATE_READY, 	 // ゲーム開始待ち.
+	GAME_STATE_TUTORIAL, // チュートリアル.
+	GAME_STATE_PLAYING,  // ゲーム進行中.
+	GAME_STATE_CLEAR, 	 // ステージクリア！.
+	GAME_STATE_DEAD, 	 // プレイヤーが撃破される.
 
 	GAME_STATE_COUNT,
 	GAME_STATE_INVALID = -1,
@@ -54,6 +55,7 @@ public:
 	FloorManager* GetFloorMgr() { return pFloorMgr; }	// 床管理クラスのポインタ取得.
 	EnemyManager* GetEnemyMgr() { return pEnemyMgr; }	// 敵管理クラスのポインタ取得.
 	BossManager* GetBossMgr() { return pBossMgr; }	// ボス管理クラスのポインタ取得.
+	BulletBuffer* GetPlaBltBuf() { return pPlayerBullet; }// プレイヤー弾丸バッファの取得.
 	BulletBuffer* GetEneBltBuf() { return pBossBullet; }// 敵弾丸バッファの取得.
 	ExplosionBuffer* GetExplMgr() { return pExplMgr; }	// 爆発のポインタ取得.
 	MyTexture* GetEffectTex() { return pEffectTex; }	// エフェクトのテクスチャ.
@@ -117,6 +119,8 @@ private:
 	FloorManager* pFloorMgr;		// 床の配列.
 	MyTexture* pFloorSlipTex;			// すりぬけ床.
 
+	BulletBuffer* pPlayerBullet;	// プレイヤーの弾丸.
+	MyTexture* pPlayerBltTex;		// プレイヤー弾丸テクスチャ.
 	BulletBuffer* pBossBullet;		// ボスの弾丸.
 	MyTexture* pEnemyBltTex;		// 敵弾丸テクスチャ.
 	BossManager* pBossMgr;
@@ -124,7 +128,11 @@ private:
 	MyTexture* pBossTexB;			// ボスBのテクスチャ
 
 	MyTexture* PlayerHPBar_Tex;		// プレイヤーのHPバー
-	MyTexture* PlayerHPBarFrame_Tex;		// プレイヤーのHPバーのフレーム
+	MyTexture* PlayerHPBarFrame_Tex;// プレイヤーのHPバーのフレーム
+	MyTexture* PlayerMeter_Tex;		// プレイヤーの必殺技ゲージ
+	MyTexture* PlayerMeterFrame_Tex;// プレイヤーの必殺技ゲージのフレーム
+	MyTexture* PlayerMeterHatsu_Tex;// プレイヤーの必殺技ゲージの発動可能メッセージ
+	MyTexture* PlayerMeterMetsu_Tex;// プレイヤーの必殺技ゲージの点滅
 	MyTexture* BossHPBar_Tex;		// ボスのHPバー
 	MyTexture* BossHPBarFrame_Tex;		// ボスのHPバーのフレーム
 
@@ -171,6 +179,8 @@ private:
 
 	CTimer timer;					// 時間管理オブジェクト(Update用).
 	CTimer fps;						// 時間管理オブジェクト(FPS表示用).
+
+	char text[256] = { 0 };
 };
 
 inline MyApp* GetApp() { return MyApp::GetAppInst(); }

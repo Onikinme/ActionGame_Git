@@ -5,6 +5,8 @@
 */
 #pragma once
 
+#include "myTexture.h"
+
 //////////////////////////////////
 // BulletOne
 // 弾丸のためのクラス：それぞれの弾丸を初期化、移動など弾丸の管理.
@@ -13,15 +15,18 @@ class BulletOne
 private:
 	float m_posX, m_posY;	// 現在位置.
 	float m_velX, m_velY;	// 弾丸速度.
+	float m_size;           // 弾丸のサイズ
 	float m_timer;			// 弾丸射出からの時刻.
 	bool m_player;          // プレイヤーの弾か？
 
 public:
 	BulletOne();			// コンストラクタ.
 	virtual ~BulletOne();
-	void Init(float x, float y, float vx, float vy);	// 射出初期化.
+	void Init(float x, float y, float vx, float vy, float size);	// 射出初期化.
 	void GetXY(float& x, float& y);	// 現在のXY座標値を得る.
+	void GetSize(float& size);      // 弾丸のサイズを得る
 	void Update(float time);		// 弾丸を進める.
+	void Draw(MyTexture*);		// 弾丸テクスチャを指定して描画.
 	float GetTime()					// 時刻を得る.
 	{
 		return m_timer;

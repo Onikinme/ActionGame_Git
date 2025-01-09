@@ -22,7 +22,8 @@ void BossTmp::Init(float posX, float posY, float vx, float vy, float w, int hp)
 
 	// 前川祐毅　追加
 	m_maxhp = hp;
-	m_boss_damageflg = false;
+	//m_boss_damageflg = false;
+	m_damageflg = 0x00;
 }
 
 //ボス描画
@@ -270,15 +271,21 @@ void BossTmp::Damage(int damage)
 }
 
 // ダメージフラグを管理
-void BossTmp::DamageFlg(bool damage)
+void BossTmp::DamageFlg(unsigned char damage)
 {
-	m_boss_damageflg = damage;
+	//m_boss_damageflg = damage;
+	m_damageflg |= damage;
+}
+
+// ダメージフラグをリセット
+void BossTmp::DamageReset(unsigned char damage) {
+	m_damageflg &= damage;
 }
 
 // 攻撃でダメージを負ったか？
-bool BossTmp::IsDamage()
+unsigned char BossTmp::IsDamage()
 {
-	return m_boss_damageflg;
+	return m_damageflg;
 }
 
 
@@ -344,7 +351,7 @@ bool BossManager::Init()
 void BossManager::ResetAll()
 {
 	for (int i = 0; i < m_bossMax; i++) {
-		Damage(i, 9999);
+		Damage(i, -9999);
 	}
 }
 // pEnemyを配列に追加.
@@ -384,7 +391,7 @@ void BossManager::Damage(int damage, int index)
 {
 	if (0 <= index && index < m_bossMax) {
 		m_ppBuffer[index]->Damage(damage);
-		if (GetHP(&index) == 0) {
+		if (GetHP(&index) <= 0) {
 			delete m_ppBuffer[index];
 			m_ppBuffer[index] = NULL;// 配列の中身をNULLクリアして次の使用に備える.
 		}
@@ -424,12 +431,18 @@ int BossManager::GetHP(int* index) {
 	return m_ppBuffer[*index]->GetHP();
 }
 
-void BossManager::DamageFlg(bool damage, int index) {
-	m_ppBuffer[index]->DamageFlg(damage);
+// ダメージフラグを管理
+void BossManager::DamageFlg(unsigned char damage, int* index) {
+	m_ppBuffer[*index]->DamageFlg(damage);
 }
 
-bool BossManager::IsDamage(int index) {
-	return m_ppBuffer[index]->IsDamage();
+// ダメージフラグをリセット
+void BossManager::DamageReset(unsigned char damage, int* index) {
+	m_ppBuffer[*index]->DamageReset(damage);
+}
+
+unsigned char BossManager::IsDamage(int* index) {
+	return m_ppBuffer[*index]->IsDamage();
 }
 
 // 配列の大きさを返す
@@ -465,4 +478,22 @@ bool BossManager::Collision(float cx, float cy, float limit2, int* pIndex)
 //アクション決定
 void BossManager::ChangeAction(int a, int index) {
 	m_ppBuffer[index]->ChangeAction(a);
+}
+
+// デバッグ用にm_pBuffer配列の中身をテキスト化する.
+// 弾丸が有効：*.
+// 弾丸が無効：-.
+char* BossManager::GetText()
+{
+	for (int i = 0; i < m_bossMax; i++) {
+		if (m_ppBuffer[i] != NULL) {
+			m_pTextBuff[i] = m_ppBuffer[i]->Getch();
+		}
+		else {
+			m_pTextBuff[i] = '-';
+		}
+	}
+	// 文字列の最後は必ずNULL文字でターミネート.
+	m_pTextBuff[m_bossMax] = NULL;
+	return m_pTextBuff;
 }
