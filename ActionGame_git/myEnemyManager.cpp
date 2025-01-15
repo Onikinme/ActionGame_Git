@@ -73,13 +73,18 @@ void EnemyBase::Damage(int damage)
 }
 
 // ダメージフラグを管理
-void EnemyBase::DamageFlg(bool damage)
+void EnemyBase::DamageFlg(unsigned char damage)
 {
 	enemy_damageflg = damage;
 }
 
+// ダメージフラグをリセット
+void EnemyBase::DamageReset(unsigned char damage) {
+	enemy_damageflg &= damage;
+}
+
 // 攻撃でダメージを負ったか？
-bool EnemyBase::IsDamage()
+unsigned char EnemyBase::IsDamage()
 {
 	return enemy_damageflg;
 }
@@ -162,7 +167,8 @@ bool EnemyManager::Init()
 void EnemyManager::ResetAll()
 {
 	for (int i = 0; i < m_enemyMax; i++) {
-		Damage(i, 9999);
+		delete m_ppBuffer[i];
+		m_ppBuffer[i] = NULL;// 配列の中身をNULLクリアして次の使用に備える.
 	}
 }
 // pEnemyを配列に追加.
@@ -202,7 +208,7 @@ void EnemyManager::Damage(int damage, int index)
 {
 	if (0 <= index && index < m_enemyMax) {
 		m_ppBuffer[index]->Damage(damage);
-			if(GetHP(&index) == 0){
+		if (GetHP(&index) <= 0) {
 			delete m_ppBuffer[index];
 			m_ppBuffer[index] = NULL;// 配列の中身をNULLクリアして次の使用に備える.
 		}
@@ -243,12 +249,17 @@ int EnemyManager::GetHP(int* index) {
 	return m_ppBuffer[*index]->GetHP();
 }
 
-void EnemyManager::DamageFlg(bool damage, int index) {
-	m_ppBuffer[index]->DamageFlg(damage);
+void EnemyManager::DamageFlg(unsigned char damage, int *index) {
+	m_ppBuffer[*index]->DamageFlg(damage);
 }
 
-bool EnemyManager::IsDamage(int index) {
-	return m_ppBuffer[index]->IsDamage();
+// ダメージフラグをリセット
+void EnemyManager::DamageReset(unsigned char damage, int* index) {
+	m_ppBuffer[*index]->DamageReset(damage);
+}
+
+unsigned char EnemyManager::IsDamage(int* index) {
+	return m_ppBuffer[*index]->IsDamage();
 }
 
 // 配列の大きさを返す

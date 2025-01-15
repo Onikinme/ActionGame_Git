@@ -165,6 +165,7 @@ void MySoundMgr::LoadSoundData()
 		_T("data/se/ganx.wav"),			// 被弾音.
 		_T("data/se/daibakuhatsu.wav"),	// 死亡音.
 		_T("data/se/S02_AO02.wav"),		// 開始音.
+		_T("data/se/jingle_boss.wav"),		// WARNING音.
 		#if defined(Shiken5)
 		_T("data/se/Clear.wav"),		// クリア音.
 		#endif

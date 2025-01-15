@@ -20,15 +20,23 @@
 // ゲーム全体の状態遷移.
 enum GameState
 {
-	GAME_STATE_TITLE, 	// タイトル画面.
-	GAME_STATE_LOAD, 	// ステージ読み込み.
-	GAME_STATE_READY, 	// ゲーム開始待ち.
-	GAME_STATE_PLAYING, // ゲーム進行中.
-	GAME_STATE_CLEAR, 	// ステージクリア！.
-	GAME_STATE_DEAD, 	// プレイヤーが撃破される.
+	GAME_STATE_TITLE, 	 // タイトル画面.
+	GAME_STATE_LOAD, 	 // ステージ読み込み.
+	GAME_STATE_WARNING,  // ゲーム開始待ち.
+	GAME_STATE_TUTORIAL, // チュートリアル.
+	GAME_STATE_PLAYING,  // ゲーム進行中.
+	GAME_STATE_CLEAR, 	 // ステージクリア！.
+	GAME_STATE_DEAD, 	 // プレイヤーが撃破される.
 
 	GAME_STATE_COUNT,
 	GAME_STATE_INVALID = -1,
+};
+
+enum BossState
+{
+	BOSS_0,
+	BOSS_1,
+	BOSS_2,
 };
 
 // プログラムに必要な変数をMyAppクラスのメンバー変数にまとめる.
@@ -54,6 +62,7 @@ public:
 	FloorManager* GetFloorMgr() { return pFloorMgr; }	// 床管理クラスのポインタ取得.
 	EnemyManager* GetEnemyMgr() { return pEnemyMgr; }	// 敵管理クラスのポインタ取得.
 	BossManager* GetBossMgr() { return pBossMgr; }	// ボス管理クラスのポインタ取得.
+	BulletBuffer* GetPlaBltBuf() { return pPlayerBullet; }// プレイヤー弾丸バッファの取得.
 	BulletBuffer* GetEneBltBuf() { return pBossBullet; }// 敵弾丸バッファの取得.
 	ExplosionBuffer* GetExplMgr() { return pExplMgr; }	// 爆発のポインタ取得.
 	MyTexture* GetEffectTex() { return pEffectTex; }	// エフェクトのテクスチャ.
@@ -117,6 +126,8 @@ private:
 	FloorManager* pFloorMgr;		// 床の配列.
 	MyTexture* pFloorSlipTex;			// すりぬけ床.
 
+	BulletBuffer* pPlayerBullet;	// プレイヤーの弾丸.
+	MyTexture* pPlayerBltTex;		// プレイヤー弾丸テクスチャ.
 	BulletBuffer* pBossBullet;		// ボスの弾丸.
 	MyTexture* pEnemyBltTex;		// 敵弾丸テクスチャ.
 	BossManager* pBossMgr;
@@ -124,9 +135,18 @@ private:
 	MyTexture* pBossTexB;			// ボスBのテクスチャ
 
 	MyTexture* PlayerHPBar_Tex;		// プレイヤーのHPバー
-	MyTexture* PlayerHPBarFrame_Tex;		// プレイヤーのHPバーのフレーム
+	MyTexture* PlayerHPBarFrame_Tex;// プレイヤーのHPバーのフレーム
+	MyTexture* PlayerMeter_Tex;		// プレイヤーの必殺技ゲージ
+	MyTexture* PlayerMeterFrame_Tex;// プレイヤーの必殺技ゲージのフレーム
+	MyTexture* PlayerMeterHatsu_Tex;// プレイヤーの必殺技ゲージの発動可能メッセージ
+	MyTexture* PlayerMeterMetsu_Tex;// プレイヤーの必殺技ゲージの点滅
 	MyTexture* BossHPBar_Tex;		// ボスのHPバー
 	MyTexture* BossHPBarFrame_Tex;		// ボスのHPバーのフレーム
+
+	MyTexture* earth_Tex;        // 地面のテクスチャ.
+	MyTexture* kanban64_Tex;        // 看板のテクスチャ.
+	MyTexture* redmaru_Tex;        // 看板のテクスチャ.
+	int kanbanflg;                  // 看板を表示するフラグ
 
 	int nextFireFrame;				// 自機が次に弾を撃てるまでの時間（フレーム）.
 	UINT buttons;					// ボタンの情報.
@@ -148,12 +168,16 @@ private:
 
 	int score;						// スコア.
 	int playerPower;				// 自機の耐久力.
+	int flash;                  // ボスを倒した瞬間のフラッシュ
 
 	UINT joyID;						// ゲームコントローラのID.
 	int gameTimer;					// 全体のタイマー.
 
 	GameState gameState;			// ゲーム全体の状態.
+	BossState bossState;			// ボスのラウンド.
 	int stateTimer;					// 状態遷移用タイマー.
+	int destroyTimer;               // ボスを倒した後のウェイトタイマー
+	int warningTimer;               // WARNINGのウェイトタイマー
 	MyTexture* pReadyTex;			// READY.
 #if defined(Shiken7)
 	MyTexture* pTitleTex;			// TITLE.
@@ -171,6 +195,8 @@ private:
 
 	CTimer timer;					// 時間管理オブジェクト(Update用).
 	CTimer fps;						// 時間管理オブジェクト(FPS表示用).
+
+	char text[256] = { 0 };
 };
 
 inline MyApp* GetApp() { return MyApp::GetAppInst(); }

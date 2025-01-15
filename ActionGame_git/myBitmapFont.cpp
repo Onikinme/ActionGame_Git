@@ -51,3 +51,37 @@ int MyBitmapFont::DrawBmpText(char* pStr, int x, int y, int stride, DWORD color)
 	sm_pSpr->End();
 	return x;
 }
+
+int MyBitmapFont::DrawBmpText(char* pStr, int x, int y, int stride, DWORD color, float ex)
+{
+	SetSizeChangeText(ex);
+	sm_pSpr->Begin(D3DXSPRITE_ALPHABLEND);
+	D3DXVECTOR3 cnt(0, 0, 0);
+	for (unsigned int i = 0; pStr[i]; i++) {
+		D3DXVECTOR3 pos(x, y, 0);
+		int code = (int)pStr[i];
+		int u = (code % 16) * 16;
+		int v = (code / 16) * 16;
+		const int size = 16;
+
+		// •\Ž¦”ÍˆÍ‚ðÝ’è‚·‚é.
+		//{ left, top, right, bottom }
+		const RECT rc = { u, v, u + size, v + size };
+		sm_pSpr->Draw(m_pTex, &rc, &cnt, &pos, color);
+		x += stride;
+	}
+
+	sm_pSpr->End();
+
+	SetSizeChangeText(1.0);
+
+	return x;
+}
+
+void MyBitmapFont::SetSizeChangeText(float ex)
+{
+	D3DXMATRIX mat;
+	D3DXMatrixIdentity(&mat);
+	D3DXMatrixScaling(&mat, ex, ex, 1);
+	sm_pSpr->SetTransform(&mat);
+}

@@ -9,7 +9,7 @@
 //#define GAME_VOLUME_MIN	(DSBVOLUME_MIN)
 //#define GAME_VOLUME_MAX	(DSBVOLUME_MAX)
   #define GAME_VOLUME_MIN	(-8000)
-  #define GAME_VOLUME_MAX	(-5000)
+  #define GAME_VOLUME_MAX	(-3000)
 
 // ‚a‚f‚lˆê——.
 enum E_BGM
@@ -32,6 +32,7 @@ enum E_SE
 	SE_HIDAN,		// ”í’e‰¹.
 	SE_DEAD,		// Ž€–S‰¹.
 	SE_START,		// ŠJŽn‰¹.
+	SE_WARNING,		// WARNING‰¹.
 #if defined(Shiken5)
 	SE_CLEAR,		// ƒNƒŠƒA‰¹.
 #endif

@@ -31,4 +31,6 @@ public:
 	}
 	int DrawBmpText(char* str, int x, int y, int stride);
 	int DrawBmpText(char* str, int x, int y, int stride, DWORD color);
+	int DrawBmpText(char* pStr, int x, int y, int stride, DWORD color, float ex);
+	void SetSizeChangeText(float ex);
 };

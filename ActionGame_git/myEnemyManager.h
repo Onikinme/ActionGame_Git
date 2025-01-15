@@ -18,11 +18,11 @@ protected:
 	MyTexture* m_pTex;		// 表示するテクスチャ.
 	D3DXVECTOR2 m_pos;		// 敵の座標
 	D3DXVECTOR2 m_vel;		// 敵の移動座標
-	float m_w, m_h;				  // 敵のサイズ
+	float m_w, m_h;			// 敵のサイズ
 	int MaxHP;				// 敵の最大体力
 	int HP;					// 敵の現在体力
 	float m_timer;			// 生成してからの時刻.
-	bool enemy_damageflg;	// 敵がダメージを受けたか（同じ攻撃で複数回ダメージを受けないようにする）
+	unsigned char enemy_damageflg;	// 敵がダメージを受けたか（同じ攻撃で複数回ダメージを受けないようにする）
 
 	// このクラスは抽象クラスなので、派生クラス以外からはnewできないようにする.
 	// そのため、コンストラクタをprotectedエリアに記述する.
@@ -75,10 +75,13 @@ public:
 	virtual void Damage(int damage);
 
 	// ダメージフラグを管理
-	virtual void DamageFlg(bool damage);
+	virtual void DamageFlg(unsigned char damage);
+
+	// ダメージフラグをリセット
+	virtual void DamageReset(unsigned char damage);
 
 	// 攻撃でダメージを負ったか？
-	virtual bool IsDamage();
+	virtual unsigned char IsDamage();
 
 	// タイマーが0以上なら有効（インライン関数）.
 	//virtual bool IsActive();
@@ -140,10 +143,13 @@ public:
 	void Damage(int damage, int index);
 
 	// ダメージフラグを管理
-	void DamageFlg(bool damage, int index);
+	void DamageFlg(unsigned char damage, int* index);
+
+	// ダメージフラグをリセット
+	void DamageReset(unsigned char damage, int* index);
 
 	// 攻撃でダメージを負ったか？
-	bool IsDamage(int index);
+	unsigned char IsDamage(int* index);
 
 	// 配列の大きさを返す
 	int EnemyMax();
