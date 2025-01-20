@@ -48,7 +48,7 @@ void ExplosionBuffer::Explose(float x, float y)
 	ExplosionOne* pExplOne = Next();
 	if (pExplOne)
 	{
-		pExplOne->Start(x, y);
+		pExplOne->Start(x - 32, y - 32);
 		_tprintf(_T("”š”­ explosion=%p\n"), pExplOne);
 	}
 }

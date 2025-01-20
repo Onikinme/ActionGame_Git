@@ -9,7 +9,7 @@
 //#define GAME_VOLUME_MIN	(DSBVOLUME_MIN)
 //#define GAME_VOLUME_MAX	(DSBVOLUME_MAX)
   #define GAME_VOLUME_MIN	(-8000)
-  #define GAME_VOLUME_MAX	(-3000)
+  #define GAME_VOLUME_MAX	(-2000)
 
 // ＢＧＭ一覧.
 enum E_BGM
@@ -17,6 +17,9 @@ enum E_BGM
 	BGM_0,
 	BGM_1,
 	BGM_2,
+	BGM_3,
+	BGM_4,
+	BGM_5,
 
 	BGM_COUNT,
 	BGM_INVALID = -1,
@@ -33,6 +36,14 @@ enum E_SE
 	SE_DEAD,		// 死亡音.
 	SE_START,		// 開始音.
 	SE_WARNING,		// WARNING音.
+	SE_ATTACK,		// 攻撃音.
+	SE_ATTACKHIT,	// 攻撃ヒット音.
+	SE_PLAYERATTACKHIT,	// 攻撃ヒット音.
+	SE_FIRE,		// 炎音.
+	SE_PLAYERBULLET,	// 攻撃ヒット音.
+	SE_PLAYERBULLETHIT,	// 攻撃ヒット音.
+	SE_CLEAR,	// ゲームクリアジングル.
+	SE_GAMEOVER,	// ゲームオーバージングル.
 #if defined(Shiken5)
 	SE_CLEAR,		// クリア音.
 #endif

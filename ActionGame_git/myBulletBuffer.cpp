@@ -214,6 +214,12 @@ bool BulletBuffer::PPBuffer(int index) {
 	return false;
 }
 
+// 無効にする.
+void BulletBuffer::Deactive(int* index) {
+	BulletOne& bullet = m_pBuffer[*index];
+	bullet.Deactive();
+}
+
 #if defined (Shiken3)
 /*
 // テクスチャ指定付きで、爆発を描画する.

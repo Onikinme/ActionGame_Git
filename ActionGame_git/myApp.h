@@ -193,6 +193,8 @@ private:
 #endif
 	MyTexture* pGameOverTex;		// GAMEOVER.
 
+	MyTexture* ptitletextTex;
+
 	CTimer timer;					// 時間管理オブジェクト(Update用).
 	CTimer fps;						// 時間管理オブジェクト(FPS表示用).
 

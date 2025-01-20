@@ -151,6 +151,9 @@ void MySoundMgr::LoadSoundData()
 		_T("data/bgm/launch.wav"),		// BGM0.
 		_T("data/bgm/C1_0838AB.wav"),	// BGM1.
 		_T("data/bgm/C1_0523AB.wav"),	// BGM2.
+		_T("data/bgm/tutorial.wav"),		// BGM3.
+		_T("data/bgm/boss1.wav"),	// BGM4.
+		_T("data/bgm/boss2.wav"),	// BGM5.
 	};
 	for (int i = BGM_BEGIN; i < BGM_COUNT; i++) {
 		if (!LoadWaveFile(&m_bgm[i], pcszBgmFileName[i])) {
@@ -165,7 +168,15 @@ void MySoundMgr::LoadSoundData()
 		_T("data/se/ganx.wav"),			// ”í’e‰¹.
 		_T("data/se/daibakuhatsu.wav"),	// Ž€–S‰¹.
 		_T("data/se/S02_AO02.wav"),		// ŠJŽn‰¹.
-		_T("data/se/jingle_boss.wav"),		// WARNING‰¹.
+		_T("data/se/jingle_boss.wav"),	// WARNING‰¹.
+		_T("data/se/attack.wav"),		// UŒ‚‰¹.
+		_T("data/se/attack_hit.wav"),	// UŒ‚ƒqƒbƒg‰¹.
+		_T("data/se/playerattack_hit.wav"),		// UŒ‚‰¹.
+		_T("data/se/boss1_fire.wav"),	// ‰Š‰¹.
+		_T("data/se/playerbullet.wav"),		// UŒ‚‰¹.
+		_T("data/se/playerbullet_hit.wav"),		// UŒ‚‰¹.
+		_T("data/se/clear.wav"),		// UŒ‚‰¹.
+		_T("data/se/gameover.wav"),		// UŒ‚‰¹.
 		#if defined(Shiken5)
 		_T("data/se/Clear.wav"),		// ƒNƒŠƒA‰¹.
 		#endif

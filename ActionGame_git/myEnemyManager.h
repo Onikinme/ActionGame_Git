@@ -22,6 +22,7 @@ protected:
 	int MaxHP;				// 敵の最大体力
 	int HP;					// 敵の現在体力
 	float m_timer;			// 生成してからの時刻.
+	float m_damagetimer;
 	unsigned char enemy_damageflg;	// 敵がダメージを受けたか（同じ攻撃で複数回ダメージを受けないようにする）
 
 	// このクラスは抽象クラスなので、派生クラス以外からはnewできないようにする.
@@ -35,6 +36,7 @@ protected:
 		, MaxHP(0)
 		, HP(0)
 		, m_timer(-1.0f)
+		, m_damagetimer(-1.0f)
 		, enemy_damageflg(false)
 	{
 	}

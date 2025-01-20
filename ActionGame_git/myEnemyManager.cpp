@@ -39,7 +39,26 @@ void EnemyBase::Show()
 	D3DXVECTOR3 pos(m_pos.x, m_pos.y, 0);
 	MyApp* myapp = GetApp();
 	ID3DXSprite* pSpr = GetApp()->GetSprite();
-	myapp->Draw(pSpr, m_pTex->GetTexture(), pos, { 0, 0, (long)m_w, (long)m_h}, m_w, m_h, false, false, false, 1);
+
+	if (m_pTex != NULL) {
+		bool damageflg = false;
+		// ダメージを受けた時の点滅
+		if (m_damagetimer > 0.0f) {
+			if (m_timer - m_damagetimer < 0.5f) damageflg = true;
+			else if (m_timer - m_damagetimer < 1.0f) {}
+			else if (m_timer - m_damagetimer < 1.5f) damageflg = true;
+			else if (m_timer - m_damagetimer < 2.0f) {}
+			else if (m_timer - m_damagetimer < 2.5f) damageflg = true;
+			else if (m_timer - m_damagetimer < 3.0f) {}
+			else if (m_timer - m_damagetimer < 3.5f) damageflg = true;
+			else if (m_timer - m_damagetimer < 4.0f) {}
+			else if (m_timer - m_damagetimer < 4.5f) damageflg = true;
+			else {
+				m_damagetimer = -1.0f;
+			}
+		}
+		myapp->Draw(pSpr, m_pTex->GetTexture(), pos, { 0, 0, (long)m_w, (long)m_h }, m_w, m_h, false, false, damageflg, 1);
+	}
 }
 
 // 現在のXY座標値を得る.
@@ -69,13 +88,14 @@ int EnemyBase::GetHP() {
 // ダメージを受けた時の処理
 void EnemyBase::Damage(int damage)
 {
+	m_damagetimer = m_timer;
 	HP -= damage;
 }
 
 // ダメージフラグを管理
 void EnemyBase::DamageFlg(unsigned char damage)
 {
-	enemy_damageflg = damage;
+	enemy_damageflg |= damage;
 }
 
 // ダメージフラグをリセット
@@ -194,7 +214,7 @@ void EnemyManager::Update(float time)
 			bool flag = m_ppBuffer[i]->Update(time);
 			// FLASEが返るとこの要素は不要になる.
 			if (!flag) {
-				Damage(i, 9999);
+				Damage(9999, i);
 			}
 		}
 	}

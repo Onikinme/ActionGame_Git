@@ -11,6 +11,7 @@ protected:
 	float m_velX, m_velY;	// XY方向への速度成分.
 	float m_w;         // ボスのサイズ
 	float m_timer;			// 生成してからの時刻.
+	float m_damagetimer;
 	int   m_animNum;        //ボスのアニメーションの添え字
 
 	// 前川祐毅　追加
@@ -35,6 +36,7 @@ protected:
 		, m_velY(0.0f)
 		, m_w(0.0f)
 		, m_timer(0.0f)
+		, m_damagetimer(-1.0f)
 		, m_animNum(0)
 		, m_hp(0)
 		, m_actionTimer(-1.0f)

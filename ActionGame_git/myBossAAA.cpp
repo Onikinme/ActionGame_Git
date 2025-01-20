@@ -6,6 +6,7 @@
 #include "stdafx.h"
 #include "myBossAAA.h"
 #include "myApp.h"
+#include "mySound.h"
 
 bool BossAAA::Update(float time)
 {
@@ -97,27 +98,29 @@ void BossAAA::Fire()
 		BulletOne* pBulletOne = GetApp()->GetEneBltBuf()->Next();
 		if (pBulletOne != NULL)
 		{
+			float ADx = 64.0f;
+			if (!m_leftFlg)//プレイヤーが右側
+			{
+				//ADx *= -1;
+			}
+			float ADy = 64.0f;
 			D3DXVECTOR2 playerpos;
+			float playersize;
 			GetApp()->GetPlayerPos(playerpos);
-			float vx =  playerpos.x - m_posX;
-			float vy =  playerpos.y - m_posY;
+			GetApp()->GetPlayerSize(playersize);
+			float vx =  playerpos.x + playersize * SIZE / 2 - (m_posX + ADx);
+			float vy =  playerpos.y + playersize * SIZE / 2 - (m_posY + ADy);
 			float distance = sqrt(vx * vx + vy * vy);
 			float dx = vx / distance;
 			float dy = vy / distance;
-
-			float ADx = 20.0f;
-			if (!m_leftFlg)//プレイヤーが右側
-			{
-				ADx *= -1;
-			}
-			float ADy = -25.0f;
 
 			float speed = 5.0f;
 			float fXSpeed = speed * dx;
 			float fYSpeed = speed * dy;
 
-			pBulletOne->Init(m_posX - ADx, m_posY - ADy, fXSpeed, fYSpeed, 16);
+			pBulletOne->Init(m_posX + ADx, m_posY + ADy, fXSpeed, fYSpeed, 32);
 			m_fireflg = true;
+			GetSoundInst()->PlaySE(SE_FIRE);
 		}
 		
 	}

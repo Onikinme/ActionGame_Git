@@ -50,6 +50,7 @@ public:
 								// 敵の弾丸とプレイヤー機との当たり判定.
 	int BulletMax(); // 配列の大きさを返す
 	bool PPBuffer(int index); // 配列が一つでも使用されているか
+	void Deactive(int* index);			// 無効にする.
 #if defined (Shiken3)
 	void Explosion(MyTexture* pTex, int index); // テクスチャ指定付きで、爆発を描画する.
 #endif

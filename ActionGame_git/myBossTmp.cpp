@@ -46,16 +46,18 @@ void BossTmp::Draw()
 	}
 
 	D3DXVECTOR3 cnt(32.0f, 32.0f, 0.0f);	// 表示時の中心位置.
-	D3DXVECTOR3 pos(m_posX, m_posY, 0.0f);	// 表示位置.
+	D3DXVECTOR3 pos(m_posX, m_posY + 1 * SIZE, 0.0f);	// 表示位置.
 	int time = (int)(m_timer / 10);			// 経過時間を10フレーム単位に換算.
 	int anim = time % 8;					// テクスチャアニメーションを8パターンで.
 	int size = 64;
-	RECT rc = { 0, m_animNum * size, size, (m_animNum + 1) * size };
+	RECT rc = { 0, m_animNum * size + 1, size, (m_animNum + 1) * size };
 
 	D3DXVECTOR2 playerpos;
+	float playersize;
 	GetApp()->GetPlayerPos(playerpos);
+	GetApp()->GetPlayerSize(playersize);
 
-	if (m_posX - playerpos.x > 0)
+	if (m_posX + m_w / 2 - playerpos.x + playersize / 2 > 0)
 	{
 		//プレイヤーがボスより左側
 		m_leftFlg = true;
@@ -67,7 +69,25 @@ void BossTmp::Draw()
 		//画像反転
 	}
 
-	GetApp()->Draw(GetApp()->GetSprite(), m_pTex->GetTexture(), pos, rc, size, size, !m_leftFlg, false, false, 1.5f);
+	if (m_pTex != NULL) {
+		bool damageflg = false;
+		// ダメージを受けた時の点滅
+		if (m_damagetimer > 0.0f) {
+			if (m_timer - m_damagetimer < 0.5f) damageflg = true;
+			else if (m_timer - m_damagetimer < 1.0f) {}
+			else if (m_timer - m_damagetimer < 1.5f) damageflg = true;
+			else if (m_timer - m_damagetimer < 2.0f) {}
+			else if (m_timer - m_damagetimer < 2.5f) damageflg = true;
+			else if (m_timer - m_damagetimer < 3.0f) {}
+			else if (m_timer - m_damagetimer < 3.5f) damageflg = true;
+			else if (m_timer - m_damagetimer < 4.0f) {}
+			else if (m_timer - m_damagetimer < 4.5f) damageflg = true;
+			else {
+				m_damagetimer = -1.0f;
+			}
+		}
+		GetApp()->Draw(GetApp()->GetSprite(), m_pTex->GetTexture(), pos, rc, size, size, !m_leftFlg, false, damageflg, 1.5f);
+	}
 }
 
 /********************
@@ -151,9 +171,11 @@ void BossTmp::Jump()
 		else
 		{
 			D3DXVECTOR2 playerpos;
+			float playersize;
 			GetApp()->GetPlayerPos(playerpos);
-			float dx = playerpos.x - m_posX;
-			float dy = playerpos.y - m_posY;
+			GetApp()->GetPlayerSize(playersize);
+			float dx = (playerpos.x + playersize / 2) - (m_posX + m_w / 2);
+			float dy = (playerpos.y + playersize / 2) - (m_posY + m_w / 2);
 			float  distance = sqrt(dx * dx + dy * dy);
 
 			//40.5f空中にいる
@@ -210,13 +232,15 @@ void BossTmp::Jump()
 //プレイヤーの方向に歩く
 void BossTmp::Move()
 {
-	D3DXVECTOR2 playerpos = {0,0};
+	D3DXVECTOR2 playerpos;
+	float playersize;
 	GetApp()->GetPlayerPos(playerpos);
+	GetApp()->GetPlayerSize(playersize);
 	if (!m_actionFlg)
 	{
-		float speed = 0.40f;
-		float dx = playerpos.x - m_posX;
-		float dy = playerpos.y - m_posY;
+		float speed = 1.0f;
+		float dx = (playerpos.x + playersize / 2) - (m_posX + m_w / 2);
+		float dy = (playerpos.y + playersize / 2) - (m_posY + m_w / 2);
 		float  distance = sqrt(dx * dx + dy * dy);
 		//高さ0まで上昇後x軸移動
 					//x軸上で重なっていない
@@ -268,6 +292,7 @@ int BossTmp::GetHP() {
 // ダメージを受けた時の処理
 void BossTmp::Damage(int damage)
 {
+	m_damagetimer = m_timer;
 	m_hp -= damage;
 }
 
@@ -352,7 +377,7 @@ bool BossManager::Init()
 void BossManager::ResetAll()
 {
 	for (int i = 0; i < m_bossMax; i++) {
-		Damage(i, -9999);
+		if(m_ppBuffer[i] != NULL)Damage(9999, i);
 	}
 }
 // pEnemyを配列に追加.
@@ -378,7 +403,7 @@ void BossManager::Update(float time)
 			bool flag = m_ppBuffer[i]->Update(time);
 			// FLASEが返るとこの要素は不要になる.
 			if (!flag) {
-				Damage(i, 9999);
+				Damage(9999, i);
 			}
 		}
 	}
